@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminLTE 3 | Vue3 | Layout</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="css/adminlte.min.css">
+</head>
+<body>
+<div class="wrapper" id="app">
+
+  <!-- 顶部页头 -->
+  <main-header>
+	  <main-header-navbar-left></main-header-navbar-left>
+  </main-header>
+
+  <!-- 左侧菜单 -->
+  <main-sidebar></main-sidebar>
+
+  <!-- 工作区 -->
+  <main-content></main-content>
+
+  <!-- 底部页脚 -->
+  <main-footer></main-footer>
+  
+  <!-- TODO: 需要考虑这个层的作用 -->
+  <div id="sidebar-overlay"></div>
+</div>
+<!-- ./wrapper -->
+
+<script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
+<script type="text/javascript">
+	const app = Vue.createApp({
+		// 必须是函数形式
+		data() {
+			return {
+				message: "Hello Vue!",
+			}
+		},
+		beforeCreate() {
+			// 阻止动画效果
+			document.body.classList.add("hold-transition");
+			// 最小化sidebar
+			document.body.classList.add("sidebar-mini");
+		},
+		created() {
+			// 完全模仿adminlte的作法，没搞明白这个样式为什么要先加上，而后再去掉
+			document.body.classList.remove("hold-transition");
+		}
+	})
+	
+	app.component('main-header', {
+		template: `<nav class="main-header navbar navbar-expand navbar-white navbar-light" style="min-height:3.5rem;">
+			<slot></slot>
+		</nav>`
+	});
+	
+	app.component('main-header-navbar-left', {
+		template: `<ul class="navbar-nav">
+			  <!--d-none d-sm-inline-block 此组样式表示在窄屏（手机竖版）下隐藏-->
+			  <li class="nav-item">
+				<push-menu/>
+			  </li>
+			</ul>`
+	});
+	
+	app.component('push-menu', {
+		methods: {
+			toggleMenu() {
+				console.log("has sidebar-collapse?",document.body.classList.contains("sidebar-collapse"));
+				console.log(document.body.classList);
+				if (!document.body.classList.contains("sidebar-collapse")) {
+					document.body.classList.add("sidebar-collapse");
+					//document.body.classList.add("sidebar-is-opening");
+				} else {
+					document.body.classList.remove("sidebar-collapse");
+				}
+			}
+		},
+		template: `<a class="nav-link" @click="toggleMenu" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>`
+	});
+	
+	app.component('main-sidebar', {
+		template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
+			<p style="color:white;">SideBar</p>
+		</aside>`,
+	});
+	
+	app.component('main-content', {
+		template: `<div class="content-wrapper">
+			Content
+		</div>`,
+	});
+	
+	app.component('main-footer', {
+		template: `<footer class="main-footer" style="min-height:3.5rem;">
+			Footer
+		</footer>`,
+	});
+	
+	// 挂载之前定义好组件，否则组件不生效
+	const vm = app.mount('#app');
+</script>
+</body>
+</html>
