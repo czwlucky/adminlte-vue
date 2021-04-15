@@ -270,65 +270,77 @@
 		},
 		data() {
 			return {
-				isOpen: this.opened,
-				height: ''
+				// 菜单是否打开必须由此属性判断，否则视图更新时会丢失打开状态
+				isOpen: this.opened
 			}
 		},
 		methods: {
-			toggleMenu(event) {
+			toggle(event) {
 				if (!this.menu.children || this.menu.children.length == 0) {
 					return;
 				}
 				event.preventDefault();
-				
+				//console.log(this.$el.childNodes[1]); // li>ul
 				const li = this.$el;
-				var ul = li.childNodes[1];
+				var el = li.childNodes[1];
 				
-				var height = ul.offsetHeight;
-				console.log("toggle height", height);
+				// 动画时长（毫秒）
+				const speed = 300;
 				
-				if (height > 0) {
-					ul.style.overflow = "hidden";
-					console.log("关闭")
-					this.height = height + "px";
+				//console.log("isOpen", this.isOpen);
+				// el.offsetHeight 是关键值，等于0时表示当前是关闭状态
+				if (this.isOpen) {
 					var that = this;
-					setTimeout(function() {
-						that.height = "0px";
-						setTimeout(function() {
-							that.height = "";
+					const height = el.offsetHeight;
+					animation({
+						speed: speed,
+						distance: height,
+						before: function() {
+							//console.log("collapse before")
+							el.style.overflow = "hidden";
+						},
+						action: function(value) {
+							//console.log("collapse action", value);
+							el.style.height = (height - value) + "px";
+						},
+						after: function() {
+							el.style.overflow = "";
+							el.style.height = "";
+							//console.log("collapse after");
+							li.classList.remove("menu-open");
 							that.isOpen = false;
-							ul.style.overflow = "";
-						},300)
-					},10)
+						}
+					})
 				} else {
-					var that = this;
+					this.isOpen = true;
+					// 仅依靠 isOpen变更来更新视图会有一个延时，所以这里直接将样式加上
+					li.classList.add("menu-open");
+					// 必须设置overflow="hidden"才可以读到正确的offsetHeight
+					el.style.overflow = "hidden";
+					//height = el.offsetHeight;
 					
-					// 通过这两个样式，使子菜单高度可读 
-					ul.style.visibility = "hidden";	
-				    ul.style.display = "block";
-					ul.style.overflow = "hidden";
-					h = ul.offsetHeight;
-					console.log("打开 height", h);
-					// 初始化高度为0，为动画做准备
-					that.height = 0;
-					that.isOpen = true;
-					setTimeout(function() {
-						// 使其可见
-						ul.style.visibility = "";
-						ul.style.display = "";
-						// 延时10毫秒重新设置高度，否则动画没有效果
-						that.height =  h + "px";
-						setTimeout(function() {
-							// 恢复样式
-							that.height = '';
-							ul.style.overflow = "";
-						},300)
-					},10)
+					animation({
+						speed: speed,
+						distance: el.offsetHeight,
+						before: function() {
+							//console.log("expand before")
+						},
+						action: function(value) {
+							//console.log("expand action", value);
+							el.style.height = value + "px";
+						},
+						after: function() {
+							el.style.overflow = "";
+							el.style.height = "";
+							//console.log("expand after");
+						}
+					})
 				}
 			}
 		},
 		template: `<li class="nav-item" :class="isOpen ? 'menu-open':''">
-		        <a :href="menu.url" :target="menu.target" class="nav-link" :class="active ? 'active':''" @click.stop="toggleMenu">
+		        <a :href="menu.url" :target="menu.target" class="nav-link" :class="active ? 'active':''"
+				 @click.stop="toggle">
 		          <i class="nav-icon" :class="menu.icon"></i>
 		          <p>
 		            {{menu.title}}
@@ -336,7 +348,7 @@
 		            <i class="right fas fa-angle-left" v-if="menu.children != null && menu.children.length > 0"></i>
 		          </p>
 		        </a>
-		        <ul class="nav nav-treeview" v-if="menu.children != null && menu.children.length > 0" :style="{height:height}">
+		        <ul class="nav nav-treeview" v-if="menu.children != null && menu.children.length > 0">
 		          <li class="nav-item" v-for="child of menu.children">
 		            <a class="nav-link"
 						:class="activeId == child.id ? 'active':''"
@@ -416,17 +428,57 @@
 	
 	// 挂载之前定义好组件，否则组件不生效
 	const vm = app.mount('#app');
-	console.log("it works!")
+	console.log("it works!");
+	
+	function animation(option) {
+		var speed = option.speed || 0; // 动画时长
+		var distance = option.distance || 0; // 运动距离
+		var before = option.before || empty; // 动画开始前
+		var action = option.action || empty; // 动画执行中
+		var after = option.after || empty; // 动画结束后
+		
+		var step = distance / (speed / 1000 * 60); // 步长
+		var start;
+		
+		//console.log("step", step);
+		if(step == 0) return;
+		
+		var w = window || {};
+		if (!w.requestAnimationFrame) {
+			w.requestAnimationFrame = w.webkitRequestAnimationFrame ||
+			w.mozRequestAnimationFrame ||
+			w.msRequestAnimationFrame ||
+			w.oRequestAnimationFrame ||
+			(function(cb) {setTimeout(cb, 16)});
+		} 
+		
+		function empty() {}
+				
+		function doAction(timestamp) {
+			if (start === undefined) {
+				start = 0;
+			}
+			// 执行动画
+			action(Math.min(start, distance));
+			
+			// 判断是否停止动画
+			if (start <= distance) {
+				//console.log("animation executing", start)
+				w.requestAnimationFrame(doAction);
+			} else {
+				//console.log("animation execute after", start)
+				after();
+			}
+			
+			// 增加步长
+			start += step;
+		}
+		
+		before();	
+		w.requestAnimationFrame(doAction);
+	}
 </script>
 <style>
-	/* 为实现菜单展开与关闭动画效果 */
-	.nav-treeview, .nav-sidebar{
-		transition: height .3s ease-in-out;
-	}
-	.nav-sidebar.nav-child-indent .nav-treeview {
-	    transition: padding .3s ease-in-out, height .3s ease-in-out;
-	    padding-left: 1rem;
-	}
 	/* 菜单选中时，父级菜单背景色渐显效果 */
 	.sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active, .sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active {
 	    transition: background ease-in-out .3s, width ease-in-out .3s;
