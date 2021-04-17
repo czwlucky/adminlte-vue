@@ -42,12 +42,12 @@ var PushMenu = {
 				this.collapse();
 			}
 			var that = this;
-			document.addEventListener("click", function() {
+			document.addEventListener("click", function(event) {
 				if (that.windowWidh < that.autoCollapseSize) {
 					that.collapse();
 				}
 			});
 			window.addEventListener("resize", this.windowed)
 		},
-		template: `<a class="nav-link" @click.prevent.stop="toggleMenu" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>`
+		template: `<a class="nav-link" @click.prevent="toggleMenu" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>`
 	}

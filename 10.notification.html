@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>AdminLTE 3 | Vue3</title>
+
+		<!-- Google Font: Source Sans Pro -->
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+		<!-- Font Awesome Icons -->
+		<link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+		<!-- Theme style -->
+		<link rel="stylesheet" href="css/adminlte.min.css">
+	</head>
+	<body>
+		<div id="app">
+			<lte-layout>
+				<!-- Header -->
+				<lte-navbar class="navbar-white navbar-light main-header" style="min-height:3.5rem;">
+					<lte-navbar-nav>
+						<lte-nav-item>
+							<lte-push-menu />
+						</lte-nav-item>
+					</lte-navbar-nav>
+					<!-- full-fill为true时，该navbar的宽度将占满剩余空间 -->
+					<!-- lte-nav-item靠右排列 -->
+					<lte-navbar-nav :full-fill="true">
+						<lte-nav-item>
+							<lte-notification :total="notifications.total" :notifications="notifications.list" position="right" />
+						</lte-nav-item>
+						<lte-nav-item :hide-in-phone="true">
+							<lte-full-screen />
+						</lte-nav-item>
+						<lte-nav-item>
+							<lte-push-controlsidebar />
+						</lte-nav-item>
+					</lte-navbar-nav>
+				</lte-navbar>
+
+				<!-- 左侧菜单 -->
+				<lte-main-sidebar style="padding-bottom: 10px;">
+					<lte-main-sidebar-logo title="AdminLTE 3 + Vue3" logo="img/AdminLTELogo.png"></lte-main-sidebar-logo>
+					<lte-sidebar>
+						<lte-user-panel title="Alexander Pierce" avatar="img/user2-160x160.jpg"></lte-user-panel>
+						<nav class="mt-2">
+							<lte-treeview :items="menus"></lte-treeview>
+						</nav>
+					</lte-sidebar>
+				</lte-main-sidebar>
+
+				<!-- 工作区 -->
+				<lte-main-content :style="{'padding-top':'5px'}">
+					<div class="col-md-10 callout callout-info" style="margin-top: 20px;margin-left: 15px;">
+						<h5>本节简介</h5>
+						<ul>
+							<li>将Notification组件化</li>
+						</ul>
+						<p>Example：</p>
+						<lte-navbar class="navbar-orange navbar-dark">
+							<lte-navbar-nav>
+								<lte-nav-item>
+									<lte-notification :total="notifications.total" :notifications="notifications.list" position="left" />
+								</lte-nav-item>
+							</lte-navbar-nav>
+						</lte-navbar>
+					</div>
+				</lte-main-content>
+
+				<!-- 系统设置区 -->
+				<lte-control-sidebar :style="{display:'none'}"></lte-control-sidebar>
+
+				<!-- 底部页脚 -->
+				<lte-main-footer>
+					<lte-copy-right></lte-copy-right>
+					<lte-version></lte-version>
+				</lte-main-footer>
+			</lte-layout>
+			<!-- TODO: 需要考虑这个层的作用 -->
+			<div id="sidebar-overlay"></div>
+		</div>
+		<!-- ./wrapper -->
+
+		<script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
+		<script src="js/Layout.js"></script>
+		<script src="js/FullScreen.js"></script>
+		<script src="js/PushMenu.js"></script>
+		<script src="js/UserPanel.js"></script>
+		<script src="js/Logo.js"></script>
+		<script src="js/CopyRight.js"></script>
+		<script src="js/Version.js"></script>
+		<script src="js/ControlSidebar.js"></script>
+		<script src="js/PushControlSidebar.js"></script>
+		<script src="js/Navbar.js"></script>
+		<script src="js/NavbarNav.js"></script>
+		<script src="js/NavItem.js"></script>
+
+		<!-- 动画脚本 -->
+		<script src="js/animations.js"></script>
+		<!-- 菜单数据 -->
+		<script src="js/menuData.js"></script>
+		<!-- 通知数据 -->
+		<script src="js/notificationData.js"></script>
+
+		<script type="text/javascript">
+			var menus = menus || [];
+			const app = Vue.createApp({
+				// 必须是函数形式
+				data() {
+					return {
+						message: "Hello Vue!",
+						menus: menus,
+						notifications: notifications
+					}
+				}
+			});
+
+			app.component('lte-layout', Layout);
+			app.component('lte-push-menu', PushMenu);
+			app.component('lte-full-screen', FullScreent);
+			app.component('lte-main-sidebar-logo', Logo);
+			app.component('lte-copy-right', CopyRight);
+			app.component('lte-version', Version);
+			app.component('lte-control-sidebar', ControlSidebar);
+			app.component('lte-push-controlsidebar', PushControlSidebar);
+			app.component('lte-user-panel', UserPanel);
+			app.component('lte-navbar', Navbar);
+			app.component('lte-navbar-nav', NavbarNav);
+			app.component('lte-nav-item', NavItem);
+
+			app.component('lte-notification', {
+				props: {
+					total: {
+						type: Number,
+						default () {
+							return 0
+						}
+					},
+					notifications: Array,
+					position: String
+				},
+				data() {
+					return {
+						isShow: false
+					}
+				},
+				methods: {
+					toggle() {
+						if (this.isShow) {
+							this.collapse();
+						} else {
+							this.open();
+						}
+					},
+					collapse() {
+						this.isShow = false;
+						this.$el.parentNode.classList.remove("show");
+					},
+					open() {
+						this.isShow = true;
+						this.$el.parentNode.classList.add("show");
+					}
+				},
+				mounted() {
+					var that = this;
+					this.$el.parentNode.classList.add("dropdown");
+					document.addEventListener("click", function(event) {
+						// $el 是占位 DOM 节点，Vue 使用它来跟踪组件在 DOM 中的位置。建议使用模板引用来直接访问 DOM 元素，而不是依赖于 $el
+						// https://v3.cn.vuejs.org/guide/component-template-refs.html
+						// 当点对象是自身（事件源）时不做操作，否则关闭通知
+						// 不要依赖.stop特性，阻止事件传波可能会有副作用，比如点击本组件时
+						// 其它组件要做动作，阻止事件传波就会导致其它组件得不到响应
+						if (event.target.parentNode !== that.$refs.btn) {
+							that.collapse();
+						}
+					});
+				},
+				template: `
+        <a class="nav-link" ref="btn" data-toggle="dropdown" href="#" aria-expanded="true" @click.prevent="toggle">
+          <i class="far fa-bell"></i>
+          <span class="badge badge-warning navbar-badge" v-if="total>0">{{total}}</span>
+        </a>
+        <div :class="{show:isShow,'dropdown-menu-right':position=='right','dropdown-menu-left':position=='left'}" class="dropdown-menu dropdown-menu-lg">
+          <span class="dropdown-item dropdown-header">{{total}} Notifications</span>
+          <div class="dropdown-divider"></div>
+		  <template v-for="item of notifications">
+          <a href="#" @click.prevent="" class="dropdown-item" style="text-decoration: none;">
+            <i :class="item.icon" class="mr-2"></i> {{item.content}}
+            <span class="float-right text-muted text-sm">{{item.time}}</span>
+          </a>
+          <div class="dropdown-divider"></div>
+		  </template>
+          <a href="#" @click.prevent="" class="dropdown-item dropdown-footer" style="text-decoration: none;">See All Notifications</a>
+        </div>`
+			})
+
+			// TODO: 以下组件需要斟酌
+			app.component('lte-treeview', {
+				props: {
+					items: Array
+				},
+				data() {
+					return {
+						activeId: 2
+					}
+				},
+				computed: {
+					parentId() {
+						for (var i = 0; i < this.items.length; i++) {
+							var item = this.items[i];
+							if (item.id == this.activeId) {
+								return item.id;
+							}
+							if (item.children && item.children.length > 0) {
+								for (var j = 0; j < item.children.length; j++) {
+									var child = item.children[j];
+									if (child.id == this.activeId) {
+										return child.parentId;
+									}
+								}
+							}
+						}
+						return null;
+					}
+				},
+				methods: {
+					menuSelect(event, id, url) {
+						console.log(id, url, event);
+						if (url && url.indexOf("http") === -1) {
+							this.activeId = id;
+							// TODO: 如果是使用Router，需要调用Router的API
+							// 如果是使用a的跳转能力，则不能阻止默认事件的执行
+							event.preventDefault();
+						}
+					}
+				},
+				template: `<ul class="nav nav-pills nav-sidebar nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
+		      <template v-for="menu of items">
+			  <lte-treeview-menu 
+				:activeId="activeId" 
+				:active="parentId == menu.id" 
+				:opened="parentId == menu.id" 
+				:menu="menu"
+				@menu-select="menuSelect"></lte-treeview-menu>
+			  </template>
+		    </ul>`
+			});
+
+			app.component('lte-treeview-menu', {
+				props: {
+					menu: Object,
+					active: {
+						type: Boolean,
+						default: function() {
+							return false;
+						}
+					},
+					activeId: Number | String,
+					opened: {
+						type: Boolean,
+						default: function() {
+							return false;
+						}
+					}
+				},
+				data() {
+					return {
+						// 菜单是否打开必须由此属性判断，否则视图更新时会丢失打开状态
+						isOpen: this.opened
+					}
+				},
+				methods: {
+					toggle(event) {
+						if (!this.menu.children || this.menu.children.length == 0) {
+							return;
+						}
+						event.preventDefault();
+						//console.log(this.$el.childNodes[1]); // li>ul
+						const li = this.$el;
+						var el = li.lastChild;
+
+						//console.log("isOpen", this.isOpen);
+						// el.offsetHeight 是关键值，等于0时表示当前是关闭状态
+						if (this.isOpen) {
+							var that = this;
+							slideUp(el, {
+								after: function() {
+									el.style.overflow = "";
+									el.style.height = "";
+									li.classList.remove("menu-open");
+									that.isOpen = false;
+								},
+								speed: 150 /*为了演示动画速度*/
+							})
+						} else {
+							this.isOpen = true;
+							// 仅依靠 isOpen变更来更新视图会有一个延时，所以这里直接将样式加上
+							li.classList.add("menu-open");
+							slideDown(el, {
+								after: function() {
+									el.style.overflow = "";
+									el.style.height = "";
+								},
+								speed: 500 /*为了演示动画速度*/
+							});
+						}
+					}
+				},
+				template: `<li :class="{
+					'menu-open':isOpen,
+					'nav-item': menu.type != 'label',
+					'nav-header': menu.type == 'label'
+				   }">
+				<template v-if="menu.type == 'label'">{{menu.title}}</template>
+		        <a :href="menu.url" :target="menu.target" class="nav-link" :class="active ? 'active':''"
+				  @click="toggle"
+				  v-if="menu.type!='label'">
+		          <i class="nav-icon" :class="menu.icon"></i>
+		          <p>
+		            {{menu.title}}
+		            <i class="right fas fa-angle-left" v-if="menu.children != null && menu.children.length > 0"></i>
+					<span class="right badge badge-danger" v-if="menu.isNew && !menu.messageCount">New</span>
+					<span class="badge badge-info right" v-if="menu.messageCount > 0">{{menu.messageCount}}</span>
+		          </p>
+		        </a>
+		        <ul class="nav nav-treeview" 
+				  v-if="menu.type!='label' && menu.children != null && menu.children.length > 0">
+		          <li class="nav-item" v-for="child of menu.children">
+		            <a class="nav-link"
+						:class="activeId == child.id ? 'active':''"
+						:href="child.url"
+						:target="child.target"
+						@click="$emit('menuSelect',$event, child.id, child.url)">
+		              <i class="nav-icon" :class="child.icon"></i>
+		              <p>
+						{{child.title}}
+						<span class="right badge badge-danger" v-if="child.isNew">New</span>
+					  </p>
+		            </a>
+		          </li>
+		        </ul>
+		      </li>`
+			});
+
+			app.component('lte-main-sidebar', {
+				template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
+			<slot><p style="color:white;">MainSideBar</p></slot>
+		</aside>`,
+			});
+
+			app.component('lte-sidebar', {
+				template: '<div class="sidebar"><slot><p style="color:white;">Menu</p></slot></div>'
+			})
+
+			app.component('lte-main-content', {
+				template: `<div class="content-wrapper">
+			<slot></slot>
+		</div>`,
+			});
+
+			app.component('lte-main-footer', {
+				template: `<footer class="main-footer" style="min-height:3.5rem;">
+			<slot></slot>
+		</footer>`,
+			});
+
+			// 挂载之前定义好组件，否则组件不生效
+			const vm = app.mount('#app');
+			console.log("it works!");
+		</script>
+		<style>
+			/* 菜单选中时，父级菜单背景色渐显效果 */
+			.sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
+			.sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active {
+				transition: background ease-in-out .3s, width ease-in-out .3s;
+			}
+		</style>
+	</body>
+</html>
