@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>AdminLTE 3 | Vue3</title>
+
+		<!-- Google Font: Source Sans Pro -->
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+		<!-- Font Awesome Icons -->
+		<link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+		<!-- Theme style -->
+		<link rel="stylesheet" href="css/adminlte.min.css">
+	</head>
+	<body>
+		<div id="app">
+			<lte-layout>
+				<!-- Header -->
+				<lte-navbar class="navbar-white navbar-light main-header" style="min-height:3.5rem;">
+					<lte-navbar-nav>
+						<lte-nav-item>
+							<lte-push-menu />
+						</lte-nav-item>
+					</lte-navbar-nav>
+					<!-- full-fill为true时，该navbar的宽度将占满剩余空间 -->
+					<!-- lte-nav-item靠右排列 -->
+					<lte-navbar-nav :full-fill="true">
+						<lte-nav-item :hide-in-phone="true">
+							<lte-full-screen />
+						</lte-nav-item>
+						<lte-nav-item>
+							<lte-control-sidebar-button />
+						</lte-nav-item>
+					</lte-navbar-nav>
+				</lte-navbar>
+
+				<!-- 左侧菜单 -->
+				<lte-main-sidebar @click.stop style="padding-bottom: 10px;">
+					<lte-main-sidebar-logo title="AdminLTE 3 + Vue3" logo="img/AdminLTELogo.png"></lte-main-sidebar-logo>
+					<lte-sidebar>
+						<lte-user-panel title="Alexander Pierce" logo="img/user2-160x160.jpg"></lte-user-panel>
+						<nav class="mt-2">
+							<lte-treeview :items="menus"></lte-treeview>
+						</nav>
+					</lte-sidebar>
+				</lte-main-sidebar>
+
+				<!-- 工作区 -->
+				<lte-main-content :style="{'padding-top':'5px'}">
+					<div class="col-md-10 callout callout-info" style="margin-top: 20px;margin-left: 15px;">
+						<h5>本节简介</h5>
+						<ul>
+							<li>将Layout组件化</li>
+							<li>ControlSidebar控制按钮组件化，可实现同一页面多个按钮控制ControlSidebar</li>
+							<li>Navbar组件化，可复用于Header或其它需要的地方</li>
+						</ul>
+						<!-- 组件测试 -->
+						<p>测试组件：</p>
+						<lte-navbar class="navbar-orange navbar-dark">
+							<lte-navbar-nav>
+								<lte-nav-item>
+									<lte-push-menu />
+								</lte-nav-item>
+								<lte-nav-item>
+									<lte-control-sidebar-button />
+								</lte-nav-item>
+								<lte-nav-item>
+									<lte-full-screen />
+								</lte-nav-item>
+							</lte-navbar-nav>
+						</lte-navbar>
+					</div>
+				</lte-main-content>
+
+				<!-- 系统设置区 -->
+				<lte-control-sidebar :style="{display:'none'}"></lte-control-sidebar>
+
+				<!-- 底部页脚 -->
+				<lte-main-footer>
+					<lte-copy-right></lte-copy-right>
+					<lte-version></lte-version>
+				</lte-main-footer>
+			</lte-layout>
+			<!-- TODO: 需要考虑这个层的作用 -->
+			<div id="sidebar-overlay"></div>
+		</div>
+		<!-- ./wrapper -->
+
+		<script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
+		<script src="js/FullScreen.js"></script>
+		<script src="js/PushMenu.js"></script>
+		<script src="js/Logo.js"></script>
+		<script src="js/CopyRight.js"></script>
+		<script src="js/Version.js"></script>
+		<script src="js/ControlSidebar.js"></script>
+		<script src="js/animations.js"></script>
+		<script src="js/menuData.js"></script>
+
+		<script type="text/javascript">
+			var menus = menus || [];
+			const app = Vue.createApp({
+				// 必须是函数形式
+				data() {
+					return {
+						message: "Hello Vue!",
+						menus: menus
+					}
+				}
+			});
+
+			app.component('lte-push-menu', PushMenu);
+			app.component('lte-full-screen', FullScreent);
+			app.component('lte-main-sidebar-logo', Logo);
+			app.component('lte-copy-right', CopyRight);
+			app.component('lte-version', Version);
+			app.component('lte-control-sidebar', ControlSidebar);
+
+			app.component('lte-layout', {
+				beforeCreate() {
+					// 阻止动画效果
+					document.body.classList.add("hold-transition");
+					// 最小化sidebar
+					document.body.classList.add("sidebar-mini");
+				},
+				mounted() {
+					this.$el.parentNode.classList.add("wrapper");
+					// 完全模仿adminlte的作法，没搞明白这个样式为什么要先加上，而后再去掉
+					document.body.classList.remove("hold-transition");
+				},
+				template: "<slot></slot>"
+			});
+
+			app.component('lte-control-sidebar-button', {
+				methods: {
+					toggleControlSidebar() {
+						let elems = document.getElementsByClassName("control-sidebar");
+						//console.log(elems);
+						if (!document.body.classList.contains("control-sidebar-slide-open")) {
+							// 隐藏横向滚动条
+							document.documentElement.classList.add("control-sidebar-animate");
+							for (let el of elems) {
+								el.style.display = 'block';
+							}
+							setTimeout(function() {
+								document.body.classList.add("control-sidebar-slide-open");
+								setTimeout(function() {
+									document.documentElement.classList.remove("control-sidebar-animate");
+								}, 350)
+							}, 10)
+						} else {
+							// 隐藏横向滚动条
+							document.documentElement.classList.add("control-sidebar-animate");
+							document.body.classList.remove("control-sidebar-slide-open");
+							var that = this;
+							setTimeout(function() {
+								for (let el of elems) {
+									el.style.display = 'none';
+								}
+								document.documentElement.classList.remove("control-sidebar-animate");
+							}, 350)
+						}
+					}
+				},
+				template: `<a class="nav-link" @click.prevent="toggleControlSidebar" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+					  <i class="fas fa-th-large"></i>
+					</a>`
+			});
+
+			app.component('lte-user-panel', {
+				props: {
+					title: {
+						type: String,
+						default: function() {
+							return 'Alexander Pierce'
+						}
+					},
+					logo: {
+						type: String,
+						default: function() {
+							return 'img/user2-160x160.jpg'
+						}
+					}
+				},
+				template: `<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+		    <div class="image">
+		      <img :src="logo" class="img-circle elevation-2" alt="User Image">
+		    </div>
+		    <div class="info">
+		      <a href="#" class="d-block">{{title}}</a>
+		    </div>
+		  </div>`
+			});
+
+			app.component('lte-treeview', {
+				props: {
+					items: Array
+				},
+				data() {
+					return {
+						activeId: 2
+					}
+				},
+				computed: {
+					parentId() {
+						for (var i = 0; i < this.items.length; i++) {
+							var item = this.items[i];
+							if (item.id == this.activeId) {
+								return item.id;
+							}
+							if (item.children && item.children.length > 0) {
+								for (var j = 0; j < item.children.length; j++) {
+									var child = item.children[j];
+									if (child.id == this.activeId) {
+										return child.parentId;
+									}
+								}
+							}
+						}
+						return null;
+					}
+				},
+				methods: {
+					menuSelect(event, id, url) {
+						console.log(id, url, event);
+						if (url && url.indexOf("http") === -1) {
+							this.activeId = id;
+							// TODO: 如果是使用Router，需要调用Router的API
+							// 如果是使用a的跳转能力，则不能阻止默认事件的执行
+							event.preventDefault();
+						}
+					}
+				},
+				template: `<ul class="nav nav-pills nav-sidebar nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
+		      <template v-for="menu of items">
+			  <lte-treeview-menu 
+				:activeId="activeId" 
+				:active="parentId == menu.id" 
+				:opened="parentId == menu.id" 
+				:menu="menu"
+				@menu-select="menuSelect"></lte-treeview-menu>
+			  </template>
+		    </ul>`
+			});
+
+			app.component('lte-treeview-menu', {
+				props: {
+					menu: Object,
+					active: {
+						type: Boolean,
+						default: function() {
+							return false;
+						}
+					},
+					activeId: Number | String,
+					opened: {
+						type: Boolean,
+						default: function() {
+							return false;
+						}
+					}
+				},
+				data() {
+					return {
+						// 菜单是否打开必须由此属性判断，否则视图更新时会丢失打开状态
+						isOpen: this.opened
+					}
+				},
+				methods: {
+					toggle(event) {
+						if (!this.menu.children || this.menu.children.length == 0) {
+							return;
+						}
+						event.preventDefault();
+						//console.log(this.$el.childNodes[1]); // li>ul
+						const li = this.$el;
+						var el = li.lastChild;
+
+						//console.log("isOpen", this.isOpen);
+						// el.offsetHeight 是关键值，等于0时表示当前是关闭状态
+						if (this.isOpen) {
+							var that = this;
+							slideUp(el, {
+								after: function() {
+									el.style.overflow = "";
+									el.style.height = "";
+									li.classList.remove("menu-open");
+									that.isOpen = false;
+								},
+								speed: 150 /*为了演示动画速度*/
+							})
+						} else {
+							this.isOpen = true;
+							// 仅依靠 isOpen变更来更新视图会有一个延时，所以这里直接将样式加上
+							li.classList.add("menu-open");
+							slideDown(el, {
+								after: function() {
+									el.style.overflow = "";
+									el.style.height = "";
+								},
+								speed: 500 /*为了演示动画速度*/
+							});
+						}
+					}
+				},
+				template: `<li :class="{
+					'menu-open':isOpen,
+					'nav-item': menu.type != 'label',
+					'nav-header': menu.type == 'label'
+				   }">
+				<template v-if="menu.type == 'label'">{{menu.title}}</template>
+		        <a :href="menu.url" :target="menu.target" class="nav-link" :class="active ? 'active':''"
+				  @click.stop="toggle"
+				  v-if="menu.type!='label'">
+		          <i class="nav-icon" :class="menu.icon"></i>
+		          <p>
+		            {{menu.title}}
+		            <i class="right fas fa-angle-left" v-if="menu.children != null && menu.children.length > 0"></i>
+					<span class="right badge badge-danger" v-if="menu.isNew && !menu.messageCount">New</span>
+					<span class="badge badge-info right" v-if="menu.messageCount > 0">{{menu.messageCount}}</span>
+		          </p>
+		        </a>
+		        <ul class="nav nav-treeview" 
+				  v-if="menu.type!='label' && menu.children != null && menu.children.length > 0">
+		          <li class="nav-item" v-for="child of menu.children">
+		            <a class="nav-link"
+						:class="activeId == child.id ? 'active':''"
+						:href="child.url"
+						:target="child.target"
+						@click="$emit('menuSelect',$event, child.id, child.url)">
+		              <i class="nav-icon" :class="child.icon"></i>
+		              <p>
+						{{child.title}}
+						<span class="right badge badge-danger" v-if="child.isNew">New</span>
+					  </p>
+		            </a>
+		          </li>
+		        </ul>
+		      </li>`
+			})
+
+			app.component('lte-navbar', {
+				template: `<nav class="navbar navbar-expand">
+			<slot></slot>
+		</nav>`
+			});
+
+			app.component('lte-navbar-nav', {
+				props: {
+					fullFill: {
+						type: Boolean
+					}
+				},
+				template: `<ul class="navbar-nav" :class="{'ml-auto': fullFill}">
+			  <slot></slot>
+			</ul>`
+			});
+
+			app.component('lte-nav-item', {
+				props: {
+					hideInPhone: {
+						type: Boolean,
+						default () {
+							return false;
+						}
+					}
+				},
+				template: `<li class="nav-item" :class="{'d-none d-sm-inline-block':hideInPhone}">
+				<slot></slot>
+			  </li>`
+			});
+
+			app.component('lte-main-sidebar', {
+				template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
+			<slot><p style="color:white;">MainSideBar</p></slot>
+		</aside>`,
+			});
+
+			app.component('lte-sidebar', {
+				template: '<div class="sidebar"><slot><p style="color:white;">Menu</p></slot></div>'
+			})
+
+			app.component('lte-main-content', {
+				template: `<div class="content-wrapper">
+			<slot></slot>
+		</div>`,
+			});
+
+			app.component('lte-main-footer', {
+				template: `<footer class="main-footer" style="min-height:3.5rem;">
+			<slot></slot>
+		</footer>`,
+			});
+
+			// 挂载之前定义好组件，否则组件不生效
+			const vm = app.mount('#app');
+			console.log("it works!");
+		</script>
+		<style>
+			/* 菜单选中时，父级菜单背景色渐显效果 */
+			.sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
+			.sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active {
+				transition: background ease-in-out .3s, width ease-in-out .3s;
+			}
+		</style>
+	</body>
+</html>
