@@ -60,16 +60,22 @@
 <!-- ./wrapper -->
 
 <script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
+<script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
 <script src="js/FullScreen.js"></script>
 <script src="js/PushMenu.js"></script>
 <script src="js/Logo.js"></script>
 <script src="js/CopyRight.js"></script>
 <script src="js/Version.js"></script>
 <script src="js/ControlSidebar.js"></script>
+<script src="js/MainSidebar.js"></script>
+
 <script src="js/animations.js"></script>
 <script src="js/menuData.js"></script>
 
 <script type="text/javascript">
+	if (!window.emitter) {
+		window.emitter = mitt();
+	}
 	var menus = menus || [];
 	const app = Vue.createApp({
 		// 必须是函数形式
@@ -124,6 +130,7 @@
 	app.component('lte-copy-right', CopyRight);
 	app.component('lte-version', Version);
 	app.component('lte-control-sidebar', ControlSidebar);
+	app.component('lte-main-sidebar', MainSidebar);
 	
 	app.component('lte-user-panel', {
 		props: {
@@ -327,12 +334,6 @@
 			    <lte-control-sidebar-button @toggle-display="onSidebarToggle"/>
 			  </li>
 			</ul>`
-	});
-	
-	app.component('lte-main-sidebar', {
-		template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
-			<slot><p style="color:white;">MainSideBar</p></slot>
-		</aside>`,
 	});
 	
 	app.component('lte-sidebar', {

@@ -67,7 +67,7 @@
 				</lte-main-content>
 
 				<!-- 系统设置区 -->
-				<lte-control-sidebar :style="{display:'none'}"></lte-control-sidebar>
+				<lte-control-sidebar></lte-control-sidebar>
 
 				<!-- 底部页脚 -->
 				<lte-main-footer>
@@ -81,6 +81,7 @@
 		<!-- ./wrapper -->
 
 		<script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
+		<script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
 		<script src="js/Layout.js"></script>
 		<script src="js/FullScreen.js"></script>
 		<script src="js/PushMenu.js"></script>
@@ -93,6 +94,7 @@
 		<script src="js/Navbar.js"></script>
 		<script src="js/NavbarNav.js"></script>
 		<script src="js/NavItem.js"></script>
+		<script src="js/MainSidebar.js"></script>
 
 		<!-- 动画脚本 -->
 		<script src="js/animations.js"></script>
@@ -102,6 +104,9 @@
 		<script src="js/notificationData.js"></script>
 
 		<script type="text/javascript">
+			if (!window.emitter) {
+				window.emitter = mitt();
+			}
 			var menus = menus || [];
 			const app = Vue.createApp({
 				// 必须是函数形式
@@ -126,6 +131,7 @@
 			app.component('lte-navbar', Navbar);
 			app.component('lte-navbar-nav', NavbarNav);
 			app.component('lte-nav-item', NavItem);
+			app.component('lte-main-sidebar', MainSidebar);
 
 			app.component('lte-notification', {
 				props: {
@@ -339,12 +345,6 @@
 		          </li>
 		        </ul>
 		      </li>`
-			});
-
-			app.component('lte-main-sidebar', {
-				template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
-			<slot><p style="color:white;">MainSideBar</p></slot>
-		</aside>`,
 			});
 
 			app.component('lte-sidebar', {
