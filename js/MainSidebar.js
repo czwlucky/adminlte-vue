@@ -1,4 +1,9 @@
 var MainSidebar = {
+	data() {
+		return {
+			autoCollapseSize: 992
+		}
+	},
 	methods: {
 		toggle() {
 			if (!document.body.classList.contains("sidebar-collapse")) {
@@ -8,17 +13,19 @@ var MainSidebar = {
 			}
 		},
 		collapse() {
+			console.log("..............")
 			document.body.classList.add("sidebar-collapse");
 			//document.body.classList.add("sidebar-is-opening");
+			document.body.classList.remove("sidebar-open");
 			if (this.windowWidh < this.autoCollapseSize) {
 				document.body.classList.add("sidebar-closed");
-				document.body.classList.remove("sidebar-open");
 			}
 		},
 		open() {
+			console.log(document.body.classList)
 			document.body.classList.remove("sidebar-collapse");
+			document.body.classList.add("sidebar-open");
 			if (this.windowWidh < this.autoCollapseSize) {
-				document.body.classList.add("sidebar-open");
 				document.body.classList.remove("sidebar-closed");
 			}
 		},
@@ -38,6 +45,10 @@ var MainSidebar = {
 		}
 		var that = this;
 		document.addEventListener("click", function(event) {
+			// 只有点周overlay层时才关闭菜单（手机上该层才会出现）
+			if (event.target !== that.$refs.overlay) {
+				return;
+			}
 			if (that.windowWidh < that.autoCollapseSize) {
 				that.collapse();
 			}
@@ -46,5 +57,7 @@ var MainSidebar = {
 	},
 	template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
 			<slot><p style="color:white;">MainSideBar</p></slot>
-		</aside>`,
+		</aside>
+		<teleport to="body"><div id="sidebar-overlay" ref="overlay"></div></teleport>
+		`,
 }
