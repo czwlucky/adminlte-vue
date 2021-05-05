@@ -36,7 +36,7 @@ var ControlSidebar = {
 			});
 		}
 	},
-	template: `<aside class="control-sidebar control-sidebar-dark" :style="{display:display}">
+	template: `<aside class="control-sidebar control-sidebar-dark" :style="{display:display}" style="overflow-y: auto;">
 			<slot>
 			<div class="p-3">
 			  <h5>Title</h5><p>Sidebar content</p>

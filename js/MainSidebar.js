@@ -13,7 +13,7 @@ var MainSidebar = {
 			}
 		},
 		collapse() {
-			console.log("..............")
+			//console.log("..............")
 			document.body.classList.add("sidebar-collapse");
 			//document.body.classList.add("sidebar-is-opening");
 			document.body.classList.remove("sidebar-open");
@@ -22,7 +22,7 @@ var MainSidebar = {
 			}
 		},
 		open() {
-			console.log(document.body.classList)
+			//console.log(document.body.classList)
 			document.body.classList.remove("sidebar-collapse");
 			document.body.classList.add("sidebar-open");
 			if (this.windowWidh < this.autoCollapseSize) {
@@ -45,7 +45,7 @@ var MainSidebar = {
 		}
 		var that = this;
 		document.addEventListener("click", function(event) {
-			// 只有点周overlay层时才关闭菜单（手机上该层才会出现）
+			// 只有点击overlay层时才关闭菜单（手机上该层才会出现）
 			if (event.target !== that.$refs.overlay) {
 				return;
 			}
