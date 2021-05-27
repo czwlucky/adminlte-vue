@@ -41,7 +41,7 @@
 				</lte-navbar>
 
 				<!-- 左侧菜单 -->
-				<lte-main-sidebar style="padding-bottom: 10px;">
+				<lte-main-sidebar>
 					<lte-main-sidebar-logo url="#/" title="AdminLTE 3 + Vue3" logo="img/AdminLTELogo.png"></lte-main-sidebar-logo>
 					<lte-sidebar>
 						<lte-user-panel title="Alexander Pierce" avatar="img/user2-160x160.jpg"></lte-user-panel>
@@ -81,7 +81,7 @@
 					<blockquote>
 						<h5>本节简介</h5>
 						<ul>
-							<li>演示路由</li>
+							<li>演示路由,菜单跟随当前浏览器路径自动选中</li>
 						</ul>
 					</blockquote>
 					<div class="container">
@@ -289,10 +289,10 @@
 				},
 				methods: {
 					menuSelect(event, id, url) {
-						//console.log(id, url, event);
+						//console.log("menuSelect", id, url, event);
+						if (id) this.activeId = id;
 						// 外链不阻止默认行为
 						if (url && url.indexOf("http") === -1) {
-							this.activeId = id;
 							event.preventDefault();
 							// 通过router的api进行导航跳转
 							this.$router.push(url);
@@ -335,6 +335,37 @@
 					}
 				},
 				methods: {
+					collapse(event) {
+						const li = this.$el;
+						var el = li.lastChild;
+						var that = this;
+						slideUp(el, {
+							after: function() {
+								el.style.overflow = "";
+								el.style.height = "";
+								li.classList.remove("menu-open");
+								that.isOpen = false;
+							},
+							speed: 300 /*为了演示动画速度*/
+						})
+					},
+					open() {
+						const li = this.$el;
+						var el = li.lastChild;
+						// 页面初始化时，路由守卫生效，但元素可能还未准备好
+						// 元素如果未准备好，直接返回
+						if (!el.tagName) return;
+						this.isOpen = true;
+						// 仅依靠 isOpen变更来更新视图会有一个延时，所以这里直接将样式加上
+						li.classList.add("menu-open");
+						slideDown(el, {
+							after: function() {
+								el.style.overflow = "";
+								el.style.height = "";
+							},
+							speed: 300 /*为了演示动画速度*/
+						});
+					},
 					toggle(event) {
 						if (!this.menu.children || this.menu.children.length == 0) {
 							if (this.menu.url && this.menu.url.indexOf("http") !== 0) {
@@ -344,35 +375,23 @@
 						}
 						// 如果有子菜单，阻止默认行为
 						event.preventDefault()
-						//console.log(this.$el.childNodes[1]); // li>ul
-						const li = this.$el;
-						var el = li.lastChild;
-
 						//console.log("isOpen", this.isOpen);
-						// el.offsetHeight 是关键值，等于0时表示当前是关闭状态
 						if (this.isOpen) {
-							var that = this;
-							slideUp(el, {
-								after: function() {
-									el.style.overflow = "";
-									el.style.height = "";
-									li.classList.remove("menu-open");
-									that.isOpen = false;
-								},
-								speed: 150 /*为了演示动画速度*/
-							})
+							this.collapse();
 						} else {
-							this.isOpen = true;
-							// 仅依靠 isOpen变更来更新视图会有一个延时，所以这里直接将样式加上
-							li.classList.add("menu-open");
-							slideDown(el, {
-								after: function() {
-									el.style.overflow = "";
-									el.style.height = "";
-								},
-								speed: 500 /*为了演示动画速度*/
-							});
+							this.open();
 						}
+					}
+				},
+				mounted() {
+					if (window.emitter) {
+						window.emitter.on('open-menu', obj => {
+							//console.log("open-menu", obj, this.isOpen);
+							if (obj.parentId == this.menu.id) {
+								this.$emit('menuSelect', event, obj.childId || obj.parentId);
+								!this.isOpen && this.open();
+							}
+						});
 					}
 				},
 				template: `<li :class="{
@@ -381,7 +400,7 @@
 					'nav-header': menu.type == 'label'
 				   }">
 				<template v-if="menu.type == 'label'">{{menu.title}}</template>
-		        <a :href="menu.url" :target="menu.target" class="nav-link" :class="active ? 'active':''"
+		        <a :href="menu.url || ''" :target="menu.target" class="nav-link" :class="active ? 'active':''"
 				  @click="toggle"
 				  v-if="menu.type!='label'">
 		          <i class="nav-icon" :class="menu.icon"></i>
@@ -400,7 +419,7 @@
 						:href="child.url"
 						:target="child.target"
 						@click="$emit('menuSelect',$event, child.id, child.url)">
-		              <i class="nav-icon" :class="child.icon"></i>
+		              <i class="nav-icon" :class="child.icon || 'far fa-circle'"></i>
 		              <p>
 						{{child.title}}
 						<span class="right badge badge-danger" v-if="child.isNew">New</span>
@@ -445,6 +464,30 @@
 			  // 4. 内部提供了 history 模式的实现。为了简单起见，我们在这里使用 hash 模式。
 			  history: VueRouter.createWebHashHistory(),
 			  routes, // `routes: routes` 的缩写
+			})
+			
+			// 全局路由守卫
+			router.beforeEach((to, from) => {
+			  const menus = vm.$data.menus;
+			  for (var i = 0; i < menus.length; i++) {
+				var item = menus[i];
+			  	if (item.url == to.path) {
+					window.emitter.emit('open-menu', {parentId:item.id});
+					return true;
+				}
+				if (item.children && item.children.length > 0) {
+					for (var j = 0; j < item.children.length; j++) {
+						var child = item.children[j];
+						if (child.url == to.path) {
+							//console.log(".....", item.id, child.id);
+							window.emitter.emit('open-menu', {parentId:item.id, childId:child.id});
+							return true;
+						}
+					}
+				}
+			  }
+			  // 返回 false 以取消导航
+			  return true
 			})
 			
 			// 5. 创建并挂载根实例
