@@ -5,7 +5,7 @@ var MainSidebar = {
 		}
 	},
 	methods: {
-		toggle() {
+		toggle() {console.log("main sidebar toggle")
 			if (!document.body.classList.contains("sidebar-collapse")) {
 				this.collapse()
 			} else {
@@ -35,9 +35,8 @@ var MainSidebar = {
 	},
 	mounted() {
 		if (window.emitter) {
-			window.emitter.on('toggle-menu', () => {
-				this.toggle();
-			});
+			//console.log("on toggle-menu", window.emitter.all, window.emitter.all.get('toggle-menu'));
+			window.emitter.on('toggle-menu', this.toggle);
 		}
 		this.windowed();
 		if (this.windowWidh < this.autoCollapseSize) {
@@ -55,9 +54,12 @@ var MainSidebar = {
 		});
 		window.addEventListener("resize", this.windowed)
 	},
+	unmounted() {
+		window.emitter.off('toggle-menu', this.toggle);
+	},
 	template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
 			<slot><p style="color:white;">MainSideBar</p></slot>
 		</aside>
 		<teleport to="body"><div id="sidebar-overlay" ref="overlay"></div></teleport>
-		`,
+		`
 }
