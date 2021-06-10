@@ -82,7 +82,7 @@
 
 		<script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
 		<script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
-		<script src="js/Layout.js"></script>
+		<!-- <script src="js/Layout.js"></script> -->
 		<script src="js/FullScreen.js"></script>
 		<script src="js/PushMenu.js"></script>
 		<script src="js/UserPanel.js"></script>
@@ -119,7 +119,7 @@
 				}
 			});
 
-			app.component('lte-layout', Layout);
+			// app.component('lte-layout', Layout);
 			app.component('lte-push-menu', PushMenu);
 			app.component('lte-full-screen', FullScreent);
 			app.component('lte-main-sidebar-logo', Logo);
@@ -132,6 +132,21 @@
 			app.component('lte-navbar-nav', NavbarNav);
 			app.component('lte-nav-item', NavItem);
 			app.component('lte-main-sidebar', MainSidebar);
+			
+			app.component('lte-layout', {
+				beforeCreate() {
+					// 阻止动画效果
+					document.body.classList.add("hold-transition");
+					// 最小化sidebar
+					document.body.classList.add("sidebar-mini");
+				},
+				mounted() {
+					this.$el.parentNode.classList.add("wrapper");
+					// 完全模仿adminlte的作法，没搞明白这个样式为什么要先加上，而后再去掉
+					document.body.classList.remove("hold-transition");
+				},
+				template: "<slot></slot>"
+			});
 
 			app.component('lte-notification', {
 				props: {

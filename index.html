@@ -319,7 +319,6 @@
 			
 			// 全局路由守卫
 			router.beforeEach((to, from, next) => {
-				console.log("route", to, from)
 			  if (to.path !== '/login' && !vm.$data.isAuthenticated)
 			   next({ path: '/login' })
 			  else next()
@@ -340,8 +339,10 @@
 					for (var j = 0; j < item.children.length; j++) {
 						var child = item.children[j];
 						if (child.url == to.path) {
-							console.log(".....", item.id, child.id);
-							window.emitter.emit('open-menu', {parentId:item.id, childId:child.id});
+							//console.log(".....", item.id, child.id);
+							setTimeout(()=> {
+								window.emitter.emit('open-menu', {parentId:item.id, childId:child.id});
+							},200)
 							return true;
 						}
 					}

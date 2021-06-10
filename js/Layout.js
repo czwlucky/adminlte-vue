@@ -4,7 +4,8 @@ var Layout = {
 		return {
 			menus: menus, // 菜单应该从外部加载
 			notifications: notifications,
-			messages: messages
+			messages: messages,
+			preloaderShow: true,
 		}
 	},
 	methods: {
@@ -63,7 +64,7 @@ var Layout = {
 	mounted() {
 		this.$el.parentNode.classList.add("wrapper");
 		document.body.classList.remove("hold-transition");
-		
+
 		if (window.emitter) {
 			window.emitter.on('dark-mode', () => {
 				if (!document.body.classList.contains("dark-mode")) {
@@ -106,8 +107,19 @@ var Layout = {
 				}
 			});
 		}
+		
+		var that = this;
+		setTimeout(()=> {
+			that.$refs.preloader.style.height = 0;
+			setTimeout(()=> {
+				that.preloaderShow = false;
+			}, 200);
+		}, 500);
 	},
-	template: `<lte-navbar class="navbar-white navbar-light main-header" style="min-height:3.5rem;">
+	template: `<div ref="preloader" class="preloader flex-column justify-content-center align-items-center" v-if="preloaderShow">
+			<img class="animation__shake" src="img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+		</div>
+	    <lte-navbar class="navbar-white navbar-light main-header" style="min-height:3.5rem;">
 					<lte-navbar-nav>
 						<lte-nav-item>
 							<lte-push-menu />
