@@ -1,7 +1,7 @@
 # AdminLTE3+Vue3
 
 #### Description
-用于学习Vue3的语法，同时探索AdminLTE用Vue来实现
+This project is to learn the usage of vue3 and to try to transform AdminLTE into a vue3 project. 
 
 #### Software Architecture
 Software architecture description
