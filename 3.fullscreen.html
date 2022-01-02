@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminLTE 3 | Vue3 | Fullscreen</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="css/adminlte.min.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- 顶部页头 -->
+  <nav ref="header" class="main-header navbar navbar-expand navbar-white navbar-light" style="min-height:3.5rem;">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" @click.prevent="toggleMenu" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" @click.prevent="toggleFullscreen" data-widget="fullscreen" href="#" role="button">
+          <i class="fas" :class="{'fa-expand-arrows-alt': !isFullScreen,'fa-compress-arrows-alt': isFullScreen}"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- 左侧菜单 -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <p style="color:white;">SideBar</p>
+  </aside>
+
+  <!-- 工作区 -->
+  <div class="content-wrapper">
+    <div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<table class="table">
+					<thead>
+					  <tr>
+						<th scope="col">#</th>
+						<th scope="col">Name</th>
+						<th scope="col"> </th>
+						<th scope="col" width="45%">Color</th>
+						<th scope="col">RGB</th>
+					  </tr>
+					</thead>
+					<tbody>
+					  <tr v-for="(color,index) in colors">
+						<td scope="row">{{index+1}}</td>
+						<td>{{color.title}}({{color.phonetic}})</td>
+						<td>{{getValue(color.hex)}}</td>
+						<td :style="getStyle(color.hex)">{{color.hex}}</td>
+						<td>{{getRgb(color.hex)}}</td>
+					  </tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+  </div>
+
+  <!-- 底部页脚 -->
+  <footer class="main-footer" style="min-height:3.5rem;">
+    Footer
+  </footer>
+  
+  <!-- 遮盖层 -->
+  <teleport to="body"><div id="sidebar-overlay" ref="overlay"></div></teleport>
+</div>
+<!-- ./wrapper -->
+<script src="https://unpkg.com/vue@next"></script>
+<script type="text/javascript">
+	if (typeof Vue == 'undefined') {
+		var script= document.createElement("script");
+		script.type = "text/javascript";
+		script.src="js/vue.global.3.2.26.js";
+		//script.setAttribute('sync', true);
+		document.body.appendChild(script);
+	}
+</script>
+<script type="text/javascript">
+	window.onload = () => {
+	  Vue.createApp({
+		setup(props) {
+			const header = Vue.ref(null);
+			const overlay = Vue.ref(null);
+            const colors = [{"rgb":"rgb(234, 192, 206)","title":"粉鳳仙","hex":"#EAC0CE","phonetic":"fěn fèng xiān","cmyk":{"c":0,"m":18,"y":12,"k":8}},{"rgb":"rgb(229, 184, 195)","title":"浅粉","hex":"#E5B8C3","phonetic":"qiǎn fěn","cmyk":{"c":0,"m":20,"y":15,"k":10}},{"rgb":"rgb(232, 175, 197)","title":"淡粉","hex":"#E8AFC5","phonetic":"dàn fěn","cmyk":{"c":0,"m":25,"y":15,"k":9}},{"rgb":"rgb(238, 165, 209)","title":"紫薇花","hex":"#EEA5D1","phonetic":"zǐ wéi huā","cmyk":{"c":0,"m":31,"y":12,"k":7}},{"rgb":"rgb(225, 141, 172)","title":"暗粉","hex":"#E18DAC","phonetic":"àn fěn","cmyk":{"c":0,"m":37,"y":24,"k":12}},{"rgb":"rgb(235, 127, 175)","title":"荷花紅","hex":"#EB7FAF","phonetic":"hé huā hóng","cmyk":{"c":0,"m":46,"y":26,"k":8}},{"rgb":"rgb(195, 166, 203)","title":"紫水晶","hex":"#C3A6CB","phonetic":"zǐ shǔi jīng","cmyk":{"c":4,"m":18,"y":0,"k":20}},{"rgb":"rgb(171, 150, 197)","title":"浅石英紫","hex":"#AB96C5","phonetic":"qiǎn shí yīng zǐ","cmyk":{"c":13,"m":24,"y":0,"k":23}},{"rgb":"rgb(210, 148, 211)","title":"浅鳳仙紫","hex":"#D294D3","phonetic":"qiǎn fèng xiān zǐ","cmyk":{"c":0,"m":30,"y":0,"k":17}},{"rgb":"rgb(109, 97, 74)","title":"将校呢（一）","hex":"#6D614A","phonetic":"jiāng xiào ní","cmyk":{"c":0,"m":11,"y":32,"k":57}},{"rgb":"rgb(80, 38, 43)","title":"黒紫","hex":"#50262B","phonetic":"hēi zǐ","cmyk":{"c":0,"m":52,"y":46,"k":69}}];
+
+			Vue.onBeforeMount(() => {
+				// 阻止动画效果
+				document.body.classList.add("hold-transition")
+				// 最小化sidebar
+				document.body.classList.add("sidebar-mini")
+			})
+
+			Vue.onMounted(()=> {
+				//console.log('onMounted', header.value, overlay.value)
+				header.value.parentNode.classList.add("wrapper")
+				document.body.classList.remove("hold-transition")
+
+				windowed()
+
+				if (windowWidh < autoCollapseSize) {
+					collapseMenu()
+				}
+
+				document.addEventListener("click", function(event) {
+				  //console.log("overlay click", overlay, event)
+				  // 只有点击overlay层时才关闭菜单（手机上该层才会出现）
+				  if (event.target !== overlay.value) {
+					return
+				  }
+				  if (windowWidh < autoCollapseSize) {
+					collapseMenu()
+				  }
+				});
+				window.addEventListener("resize", windowed);
+                
+                // 全屏
+                document.addEventListener('fullscreenchange', () => {
+                  isFullScreen.value = !isFullScreen.value;
+                })
+                document.addEventListener('mozfullscreenchange', () => {
+                  isFullScreen.value = !isFullScreen.value;
+                })
+                document.addEventListener('webkitfullscreenchange', () => {
+                  isFullScreen.value = !isFullScreen.value;
+                })
+                document.addEventListener('msfullscreenchange', () => {
+                  isFullScreen.value = !isFullScreen.value;
+                })
+			})
+
+			// PushMenu
+			let autoCollapseSize = 992
+			let windowWidh = null
+
+			const toggleMenu = () => {
+			  if (!document.body.classList.contains("sidebar-collapse")) {
+				collapseMenu()
+			  } else {
+				openMenu()
+			  }
+			}
+
+			const windowed = () => {
+				windowWidh = window.innerWidth || document.documentElement.clientWidth;
+			}
+
+			const collapseMenu = () => {
+				document.body.classList.add("sidebar-collapse");
+				//document.body.classList.add("sidebar-is-opening");
+				document.body.classList.remove("sidebar-open");
+				if (windowWidh < autoCollapseSize) {
+					document.body.classList.add("sidebar-closed");
+				}
+			}
+
+			const openMenu = () => {
+				//console.log(document.body.classList)
+				document.body.classList.remove("sidebar-collapse");
+				document.body.classList.add("sidebar-open");
+				if (windowWidh < autoCollapseSize) {
+					document.body.classList.remove("sidebar-closed");
+				}
+			}
+
+            // 全屏
+            const isFullScreen = Vue.ref(false);
+
+            const toggleFullscreen = () => {
+                let main = document.body
+                if (isFullScreen.value) {
+                  if (document.exitFullscreen) {
+                    document.exitFullscreen()
+                  } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen()
+                  } else if (document.webkitCancelFullScreen) {
+                    document.webkitCancelFullScreen()
+                  } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen()
+                  }
+                } else {
+                  if (main.requestFullscreen) {
+                    main.requestFullscreen()
+                  } else if (main.mozRequestFullScreen) {
+                    main.mozRequestFullScreen()
+                  } else if (main.webkitRequestFullScreen) {
+                    main.webkitRequestFullScreen()
+                  } else if (main.msRequestFullscreen) {
+                    main.msRequestFullscreen()
+                  }
+                }
+            }
+
+            // 颜色列表
+            const calcRgb = t => {
+				t = t.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(t, e, d, i) {
+					return e + e + d + d + i + i
+				});
+				var e = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(t);
+				return e ? {
+					r: parseInt(e[1], 16),
+					g: parseInt(e[2], 16),
+					b: parseInt(e[3], 16)
+				} : null
+			}
+
+			const getRgb = hex => {
+				const rgb = calcRgb(hex.toLowerCase());
+				return rgb.r + "," + rgb.g + "," + rgb.b;
+			}
+
+			const getValue = hex => {
+				const rgb = calcRgb(hex.toLowerCase());
+				return (.2126 * rgb.r + .7152 * rgb.g + .0722 * rgb.b).toFixed(2);
+			}
+
+			const getStyle = hex => {
+				const value = getValue(hex);
+				return {
+					backgroundColor: hex,
+					color: value > 100 ? "black":"white"
+				}
+			}
+
+			return {
+				header,
+				overlay,
+				toggleMenu,
+                isFullScreen,
+                toggleFullscreen,
+                colors,
+				getRgb,
+				getValue,
+				getStyle,
+			}
+		}
+	  }).mount('#app');
+	}
+</script>
+<style>
+	td[style] {
+		color: #fff;
+	}
+</style>
+</body>
+</html>
