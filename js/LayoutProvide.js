@@ -11,20 +11,22 @@ const ClassicLayout = {
             type: Boolean,
             default: false
         },
-        menuClose: Boolean
+        preloaderAutoClose: Boolean,
+        menuCollapse: Boolean
     },
     setup(props) {
         // 预加载遮盖层
         const preloader = Vue.ref(null);
         // 预加载遮盖层是否显示，默认不显示
         const preloaderShow = Vue.ref(props.preloaderVisible);
-
-        if (!props.menuClose) {
-            document.body.classList.add("sidebar-open");
-        } else {
-            document.body.classList.add("sidebar-collapse");
-            document.body.classList.add("sidebar-closed");
+        const closePreloader = ()=> {
+            preloader.value.style.height = 0;
+            setTimeout(()=> {
+                preloaderShow.value = false;
+            }, 200);
         }
+        // 向子组件暴漏关闭遮盖层方法
+        Vue.provide("closePreloader", closePreloader);
 
         // PushMenu相关
         const overlay = Vue.ref(null);
@@ -45,8 +47,8 @@ const ClassicLayout = {
         }
 
         const collapseMenu = () => {
+            document.body.classList.add("sidebar-mini")
             document.body.classList.add("sidebar-collapse");
-            //document.body.classList.add("sidebar-is-opening");
             document.body.classList.remove("sidebar-open");
             if (windowWidh < autoCollapseSize) {
                 document.body.classList.add("sidebar-closed");
@@ -54,32 +56,32 @@ const ClassicLayout = {
         }
 
         const openMenu = () => {
-            //console.log(document.body.classList)
+            document.body.classList.remove("sidebar-mini")
             document.body.classList.remove("sidebar-collapse");
+            document.body.classList.remove("sidebar-closed");
             document.body.classList.add("sidebar-open");
-            if (windowWidh < autoCollapseSize) {
-                document.body.classList.remove("sidebar-closed");
-            }
         }
 
-        console.log("provide(toggleMenu)")
+        console.log("provide(toggleMenu)");
+        // 向子组件暴漏开合菜单栏方法
         Vue.provide('toggleMenu', toggleMenu);
 
         Vue.onBeforeMount(() => {
             // 阻止动画效果
             document.body.classList.add("hold-transition")
-            // 最小化sidebar
-            document.body.classList.add("sidebar-mini")
+
+            if (!props.menuCollapse) {
+                openMenu();
+            } else {
+                collapseMenu();
+            }
         })
 
         Vue.onMounted(()=> {
             // 如果预加载遮盖层显示，停一段时间之后，使其收起并隐藏
-            if (preloaderShow.value) {
+            if (preloaderShow.value && props.preloaderAutoClose) {
                 setTimeout(()=> {
-                    preloader.value.style.height = 0;
-                    setTimeout(()=> {
-                        preloaderShow.value = false;
-                    }, 200);
+                    closePreloader();
                 }, 500);
             }
             // 为父组件添加样式，该样式是adminlte的关键样式之一
