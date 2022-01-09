@@ -14,7 +14,7 @@
 </head>
 <body>
     <div id="app">
-      <lte-layout logo="img/AdminLTELogo.png" menu-collapse preloader-visible preloader-auto-close>
+      <lte-layout logo="img/AdminLTELogo.png" menu-collapse preloader-visible>
         <!-- 顶部页头 -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light" style="min-height:3.5rem;">
           <ul class="navbar-nav">
@@ -32,6 +32,8 @@
         <!-- 左侧菜单 -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
           <p style="color:white;">SideBar</p>
+          <!-- Sidebar Menu -->
+          <lte-menu></lte-menu>
         </aside>
 
         <!-- 工作区 -->
@@ -64,6 +66,31 @@
 <script src="js/LayoutProvide.js"></script>
 <script src="js/PushMenuInject.js"></script>
 <script src="js/Fullscreen.js"></script>
+
+<script>
+  const Menu = {
+    name: "LteMenu",
+    setup() {
+      Vue.onMounted(()=> {
+        // 菜单加载完毕，去掉遮盖层
+        const setPreloaderMessage = Vue.inject('setPreloaderMessage');
+        const closePreloader = Vue.inject('closePreloader');
+        setTimeout(()=> {
+          setPreloaderMessage("系统正在拼命加载中，请稍后...")
+          setTimeout(()=> {
+            closePreloader();
+          }, 2000);
+        }, 1000);
+      });
+    },
+    template: `
+      <nav class="mt-2">
+      </nav>
+    `
+  }
+  Vue.components = Vue.components || [];
+  Vue.components.push(Menu);
+</script>
 
 <script type="text/javascript">
   const app = Vue.createApp({});

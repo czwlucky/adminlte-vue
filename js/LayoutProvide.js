@@ -27,6 +27,12 @@ const ClassicLayout = {
         }
         // 向子组件暴漏关闭遮盖层方法
         Vue.provide("closePreloader", closePreloader);
+        const message = Vue.ref("");
+        const setPreloaderMessage = msg=> {
+            message.value = msg;
+        }
+        // 向子组件暴漏设置消息方法
+        Vue.provide("setPreloaderMessage", setPreloaderMessage);
 
         // PushMenu相关
         const overlay = Vue.ref(null);
@@ -111,6 +117,7 @@ const ClassicLayout = {
         return {
             preloader,
             preloaderShow,
+            message,
             overlay,
         }
     },
@@ -118,6 +125,7 @@ const ClassicLayout = {
       <div class="wrapper">
         <div ref="preloader" class="preloader flex-column justify-content-center align-items-center" v-if="preloaderShow">
 		  <img class="animation__shake" :src="logo" alt="Logo" height="60" width="60">
+          <span style="position: absolute; bottom: 20px;">{{message}}</span>
 	    </div>
         <slot></slot>
       </div>
