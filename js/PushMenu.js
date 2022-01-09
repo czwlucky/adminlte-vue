@@ -11,9 +11,9 @@ const PushMenu = {
 
         const toggleMenu = () => {
             if (!document.body.classList.contains("sidebar-collapse")) {
-            collapseMenu();
+              collapseMenu();
             } else {
-            openMenu();
+              openMenu();
             }
         }
 
@@ -40,23 +40,23 @@ const PushMenu = {
         }
 
         Vue.onMounted(()=> {
-            windowed()
+            windowed();
 
             if (windowWidh < autoCollapseSize) {
-                collapseMenu()
+                collapseMenu();
             }
 
             document.addEventListener("click", function(event) {
               //console.log("overlay click", overlay, event)
               // 只有点击overlay层时才关闭菜单（手机上该层才会出现）
               if (event.target !== overlay.value) {
-                return
+                return;
               }
               if (windowWidh < autoCollapseSize) {
-                collapseMenu()
+                collapseMenu();
               }
             });
-            window.addEventListener("resize", windowed)
+            window.addEventListener("resize", windowed);
         })
         
         return {
