@@ -78,7 +78,7 @@ const MenuItem = {
       'menu-open': menu._opened_ && menu.children != null && menu.children.length > 0
        }">
       <template v-if="menu.type == 'label'">{{menu.title}}</template>
-      <a class="nav-link"
+      <a class="nav-link nav_ell"
         :href="menu.url||menu.path||'#'"
         :target="menu.target"
         :class="{'active':menu._active_ }"
@@ -86,7 +86,7 @@ const MenuItem = {
         @click="clickHandler">
         <i class="nav-icon" :class="menu.icon || 'far fa-circle'"></i>
         <p>
-        {{menu.title || menu.label || menu.name}}
+        <span class="nav_text">{{menu.title || menu.label || menu.name}}</span>
         <i class="right fas fa-angle-left" v-if="menu.children != null && menu.children.length > 0"></i>
 				<span class="right badge badge-danger" v-if="menu.isNew && !menu.messageCount">New</span>
 				<span class="badge badge-info right" v-if="menu.messageCount > 0">{{menu.messageCount}}</span>
