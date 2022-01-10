@@ -77,9 +77,12 @@
         const closePreloader = Vue.inject('closePreloader');
         setTimeout(()=> {
           setPreloaderMessage("系统正在拼命加载中，请稍后...")
-          setTimeout(()=> {
-            closePreloader();
-          }, 2000);
+          setTimeout(() => {
+            setPreloaderMessage("加载完毕，请耐心等待片刻...")
+            setTimeout(()=> {
+              closePreloader();
+            }, 2000);
+          }, 1000);
         }, 1000);
       });
     },

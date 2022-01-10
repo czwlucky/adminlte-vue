@@ -27,6 +27,7 @@ const ClassicLayout = {
         }
         // 向子组件暴漏关闭遮盖层方法
         Vue.provide("closePreloader", closePreloader);
+        
         const message = Vue.ref("");
         const setPreloaderMessage = msg=> {
             message.value = msg;
@@ -82,6 +83,19 @@ const ClassicLayout = {
                 collapseMenu();
             }
         })
+
+        // TODO: 需要深入研究Povide/Inject
+        // Array类型的变量，子组件只响应一次，后面即丢失响应性，不知为何
+        // 采用reactive进行包装之后，赋值时须用ref进行包装，子组件才可以保持响应性
+        const menuStyle = Vue.reactive({styles:[]});
+        // 向子组件暴漏菜单风格属性
+        Vue.provide('menuStyle', menuStyle);
+        const setMenuStyle = style=> {
+            // 如果不重新赋值为响应式对象，子组件中会丢失响应性
+            menuStyle.styles = Vue.ref(style);
+            console.log("menustyle", menuStyle)
+        }
+        Vue.provide('setMenuStyle', setMenuStyle);
 
         Vue.onMounted(()=> {
             // 如果预加载遮盖层显示，停一段时间之后，使其收起并隐藏
