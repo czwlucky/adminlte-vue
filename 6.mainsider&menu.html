@@ -60,7 +60,7 @@
             </div>
 
             <!-- Sidebar Menu -->
-            <nav class="mt-2">
+            <nav class="mt-2 mb-2">
               <lte-tree-menu :menus="menus"></lte-tree-menu>
             </nav>
           </div>
@@ -80,8 +80,8 @@
     </div>
 </body>
 <script src="js/vue.global.3.2.26.js"></script>
-<!-- Event Bus -->
-<script src="js/mitt.umd.js"></script>
+<!-- 动画 -->
+<script src="js/animations.js"></script>
 <!-- 组件 -->
 <script src="js/LayoutProvide.js"></script>
 <script src="js/PushMenuInject.js"></script>
@@ -126,12 +126,21 @@
       }
     },
     template: `
-    <div style="widh:100%; height:100%;display: flex; flex-direction: column;align-items: center;justify-content: center;">
-          <div class="mb-1"><input type="checkbox" value="nav-flat" class="mr-1" @change="navStyleChange"><span>Nav Flat Style</span></div>
-          <div class="mb-1"><input type="checkbox" value="nav-legacy" class="mr-1" @change="navStyleChange"><span>Nav Legacy Style</span></div>
-          <div class="mb-1"><input type="checkbox" value="nav-compact" class="mr-1" @change="navStyleChange"><span>Nav Compact</span></div>
-          <div class="mb-1"><input type="checkbox" value="nav-child-indent" class="mr-1" @change="navStyleChange"><span>Nav Child Indent</span></div>
-          <div class="mb-1"><input type="checkbox" value="nav-collapse-hide-child" class="mr-1" @change="navStyleChange"><span>Nav Child Hide on Collapse</span></div>
+    <div style="width:100%;min-height: 300px;display:flex; flex-direction: column; justify-content:center;align-items:center;">
+    <div class="position-relative p-3 bg-info" style="height: 180px;width: 300px;">
+      <div class="ribbon-wrapper ribbon-lg">
+        <div class="ribbon bg-success text-lg">
+          Menu Style
+        </div>
+      </div>
+      <div>
+        <div class="mb-1"><input type="checkbox" value="nav-flat" class="mr-1" @change="navStyleChange"><span>Nav Flat Style</span></div>
+        <div class="mb-1"><input type="checkbox" value="nav-legacy" class="mr-1" @change="navStyleChange"><span>Nav Legacy Style</span></div>
+        <div class="mb-1"><input type="checkbox" value="nav-compact" class="mr-1" @change="navStyleChange"><span>Nav Compact</span></div>
+        <div class="mb-1"><input type="checkbox" value="nav-child-indent" class="mr-1" @change="navStyleChange"><span>Nav Child Indent</span></div>
+        <div class="mb-1"><input type="checkbox" value="nav-collapse-hide-child" class="mr-1" @change="navStyleChange"><span>Nav Child Hide on Collapse</span></div>
+      </div>
+    </div>
     </div>
     `
   }
@@ -161,7 +170,8 @@
       }, {
         title: "Widgets",
         icon: "fas fa-th",
-        isNew: true
+        isNew: true,
+        opened: true,
       },{
         title: "Layout Options",
         icon: "fas fa-copy",
@@ -220,6 +230,30 @@
       },{
         title: "Gallery",
         icon: "fas fa-image"
+      },{
+        title: "Level 1",
+        icon: "fas fa-circle",
+        children: [{
+          title: "Level 2",
+          children: [{
+            title: "Level 3",
+          },{
+            title: "Level 3",
+          }]
+        },{
+          title: "Level 2",
+          children: [{
+            title: "Level 3",
+          },{
+            title: "Level 3",
+          }]
+        }]
+      },{
+        title: "Baidu",
+        icon: "fas fa-link",
+        messageCount: 2,
+        url: "http://www.baidu.com",
+        target: "_blank"
       }];
 
       return {
