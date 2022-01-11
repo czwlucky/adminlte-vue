@@ -61,7 +61,8 @@
 
             <!-- Sidebar Menu -->
             <nav class="mt-2 mb-2">
-              <lte-tree-menu :menus="menus" default-menu-url="#dashboardv2"></lte-tree-menu>
+              <!-- 还可以使用default-menu-url="#dashboardv2"设置默认菜单，如果两个属性同时使用，先找到哪个算哪个 -->
+              <lte-tree-menu :menus="menus" default-menu-id="3" ></lte-tree-menu>
             </nav>
           </div>
           <!-- /.sidebar -->
