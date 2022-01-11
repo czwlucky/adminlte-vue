@@ -75,11 +75,14 @@ const ClassicLayout = {
 
         // 向子组件暴漏设置或读取当前菜单方法
         let currentMenu = null;
+        const refMenu = Vue.reactive({menu:null});
         Vue.provide("getCurrentMenu", ()=>currentMenu);
         Vue.provide("setCurrentMenu", menu=> {
-            currentMenu=menu;
+            currentMenu = menu;
+            refMenu.menu = menu;
             //console.log("当前菜单：", menu);
         });
+        Vue.provide("defaultMenu", refMenu);
 
         Vue.onBeforeMount(() => {
             // 阻止动画效果

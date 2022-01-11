@@ -33,13 +33,14 @@ const MenuItem = {
         return;
       }
 
-      event.preventDefault();
-
       // 没有子菜单，直接触发菜单回调
       if (!menu.children || menu.children.length == 0) {
         selectMenu(menu);
         return;
       }
+
+      // 阻止默认行为
+      event.preventDefault();
 
       // 展开或关闭子菜单
       let subMenuEl = subMenus.value;
@@ -104,10 +105,8 @@ const TreeMenu = {
     name: "LteTreeMenu",
     props: {
         menus: Array,
-        defaultOpenIndex: {
-          type: Number,
-          default: 0
-        }
+        defaultMenuId: Number|String,
+        defaultMenuUrl: String
     },
     setup(props, context) {
       // 包装成响应式对象，更新时，子组件才会发生变动
@@ -115,6 +114,8 @@ const TreeMenu = {
 
       const menuStyle = Vue.inject('menuStyle');
       console.log("inject menuStyle", menuStyle)
+
+      const defaultMenu = Vue.inject('defaultMenu');
 
       const setCurrentMenu = Vue.inject("setCurrentMenu");
 
@@ -129,6 +130,8 @@ const TreeMenu = {
         if (menu._active_) {
           return
         }
+        // 向子组件暴漏选中菜单方法
+        Vue.provide("selectMenu", selectMenu);
 
         // 上报当前选中的菜单
         setCurrentMenu(menu);
@@ -153,8 +156,41 @@ const TreeMenu = {
           return item == menu; //(item.id && item.id == menu.id) || (item.url && item.url == menu.url) || (item.path && item.path == menu.path) || (item.title && item.title == menu.title) || (item.label && item.label == menu.label) || (item.name && item.name == menu.name);
         }
       }
+      
+      // 默认菜单
+      let id = props.defaultMenuId;
+      let url = props.defaultMenuUrl;
+      if (id || url) {
+        for (const menu of list) {
+          if ((id && menu.id == id) || (url && (menu.url == url || menu.path == url))) {
+            selectMenu(menu);
+          } else if (menu.children && menu.children.length > 0) {
+            let m = findDefaultMenu({id: id, url: url}, menu.children);
+            if (m) {
+              menu._opened_ = true;
+              selectMenu(m);
+            }
+          }
+        }
+      }
 
-      Vue.provide("selectMenu", selectMenu);
+      function findDefaultMenu(defaultMenu, menus) {
+        for (const menu of menus) {
+          let {id, url} = defaultMenu;
+          if ((id && menu.id == id) || (url && (menu.url == url || menu.path == url))) {
+            return menu;
+          }
+          if (menu.children && menu.children.length > 0) {
+            let m = findDefaultMenu(defaultMenu, menu.children);
+            if (m) {
+              menu._opened_ = true;
+              return m;
+            }
+          }
+        }
+        return null;
+      }
+
       return {
         list,
         menuStyle,

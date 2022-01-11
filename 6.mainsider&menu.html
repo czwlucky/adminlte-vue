@@ -11,18 +11,6 @@
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="css/adminlte.min.css">
-  <style>
-    .nav-link.nav_ell{
-      display: flex;
-      align-items: center;
-    }
-    .nav_text{
-      display: flex;
-      overflow: hidden;
-      /* text-overflow: ellipsis; */
-      max-width: 7em;
-    }
-  </style>
 </head>
 <body>
     <div id="app">
@@ -73,7 +61,7 @@
 
             <!-- Sidebar Menu -->
             <nav class="mt-2 mb-2">
-              <lte-tree-menu :menus="menus"></lte-tree-menu>
+              <lte-tree-menu :menus="menus" default-menu-url="#dashboardv2"></lte-tree-menu>
             </nav>
           </div>
           <!-- /.sidebar -->
@@ -150,21 +138,44 @@
     },
     template: `
     <div style="width:100%;min-height: 400px;display:flex; flex-direction: column; justify-content:center;align-items:center;">
-      <div>当前选中菜单：{{menu.title}}<button type="button" @click="getMenu" class="btn btn-block btn-primary">获取当前菜单</button></div>
-    <div class="position-relative p-3 bg-info" style="height: 180px;width: 300px;margin-top:10px;">
-      <div class="ribbon-wrapper ribbon-lg">
-        <div class="ribbon bg-success text-lg">
-          Menu Style
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-ellipsis-v"></i>
+                当前菜单
+              </h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control" placeholder="当前菜单" :value="menu.title">
+                <span class="input-group-append">
+                  <button type="button" class="btn btn-info btn-flat"  @click="getMenu">获取</button>
+                </span>
+              </div>
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+        </div>
+        <!-- ./col -->
+      </div>
+      <div class="position-relative p-3 bg-info" style="height: 180px;width: 300px;margin-top:10px;">
+        <div class="ribbon-wrapper ribbon-lg">
+          <div class="ribbon bg-success text-lg">
+            Menu Style
+          </div>
+        </div>
+        <div>
+          <div class="mb-1"><input type="checkbox" value="nav-flat" class="mr-1" @change="navStyleChange"><span>Nav Flat Style</span></div>
+          <div class="mb-1"><input type="checkbox" value="nav-legacy" class="mr-1" @change="navStyleChange"><span>Nav Legacy Style</span></div>
+          <div class="mb-1"><input type="checkbox" value="nav-compact" class="mr-1" @change="navStyleChange"><span>Nav Compact</span></div>
+          <div class="mb-1"><input type="checkbox" value="nav-child-indent" class="mr-1" @change="navStyleChange"><span>Nav Child Indent</span></div>
+          <div class="mb-1"><input type="checkbox" value="nav-collapse-hide-child" class="mr-1" @change="navStyleChange"><span>Nav Child Hide on Collapse</span></div>
         </div>
       </div>
-      <div>
-        <div class="mb-1"><input type="checkbox" value="nav-flat" class="mr-1" @change="navStyleChange"><span>Nav Flat Style</span></div>
-        <div class="mb-1"><input type="checkbox" value="nav-legacy" class="mr-1" @change="navStyleChange"><span>Nav Legacy Style</span></div>
-        <div class="mb-1"><input type="checkbox" value="nav-compact" class="mr-1" @change="navStyleChange"><span>Nav Compact</span></div>
-        <div class="mb-1"><input type="checkbox" value="nav-child-indent" class="mr-1" @change="navStyleChange"><span>Nav Child Indent</span></div>
-        <div class="mb-1"><input type="checkbox" value="nav-collapse-hide-child" class="mr-1" @change="navStyleChange"><span>Nav Child Hide on Collapse</span></div>
-      </div>
-    </div>
     </div>
     `
   }
@@ -178,28 +189,33 @@
       const menus = [{
         title: "Dashboard",
         icon: "fas fa-tachometer-alt",
-        opened: true,
-        isActive: true,
         children: [{
+          id: 1,
           title: "Dashboard v1",
           isActive: true,
           icon: "far fa-circle",
+          url: "#dashboardv1"
         },{
+          id: 2,
           title: "Dashboard v2",
           icon: "far fa-circle",
+          url: "#dashboardv2"
         },{
+          id: 3,
           title: "Dashboard v3",
           icon: "far fa-circle",
+          url: "#dashboardv3"
         }]
       }, {
         title: "Widgets",
         icon: "fas fa-th",
         isNew: true,
-        opened: true,
+        url: "#widgets"
       },{
         title: "Layout Options",
         icon: "fas fa-copy",
         messageCount: 6,
+        isNew: true,
         children: [{
           title: "Top Navigation",
           icon: "far fa-circle",
@@ -292,19 +308,10 @@
 </script>
 
 <style>
-  /* 菜单选中时，父级菜单背景色渐显效果 */
+  /* 菜单选中时，父级菜单背景色渐显效果
   .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
   .sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active {
     transition: background ease-in-out .3s, width ease-in-out .3s;
-  }
-
-  /* 菜单文字不折行 */
-  .main-sidebar .brand-text,
-  .main-sidebar .logo-xl,
-  .main-sidebar .logo-xs,
-  .sidebar .nav-link p,
-  .sidebar .user-panel .info {
-    white-space: nowrap;
-  }
+  } */
 </style>
 </html>
