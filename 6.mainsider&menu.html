@@ -133,13 +133,25 @@
         setMenuStyle(styles);
       }
 
+      // 获取当前菜单的方法
+      const getCurrentMenu = Vue.inject("getCurrentMenu");
+
+      const menu = Vue.ref({});
+      const getMenu = ()=> {
+        // 将当前菜单赋值给响应式变量
+        menu.value = getCurrentMenu() || {title: "当前没有选中菜单"};
+      }
+
       return {
+        menu,
+        getMenu,
         navStyleChange
       }
     },
     template: `
-    <div style="width:100%;min-height: 300px;display:flex; flex-direction: column; justify-content:center;align-items:center;">
-    <div class="position-relative p-3 bg-info" style="height: 180px;width: 300px;">
+    <div style="width:100%;min-height: 400px;display:flex; flex-direction: column; justify-content:center;align-items:center;">
+      <div>当前选中菜单：{{menu.title}}<button type="button" @click="getMenu" class="btn btn-block btn-primary">获取当前菜单</button></div>
+    <div class="position-relative p-3 bg-info" style="height: 180px;width: 300px;margin-top:10px;">
       <div class="ribbon-wrapper ribbon-lg">
         <div class="ribbon bg-success text-lg">
           Menu Style

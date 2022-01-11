@@ -73,6 +73,14 @@ const ClassicLayout = {
         // 向子组件暴漏开合菜单栏方法
         Vue.provide('toggleMenu', toggleMenu);
 
+        // 向子组件暴漏设置或读取当前菜单方法
+        let currentMenu = null;
+        Vue.provide("getCurrentMenu", ()=>currentMenu);
+        Vue.provide("setCurrentMenu", menu=> {
+            currentMenu=menu;
+            //console.log("当前菜单：", menu);
+        });
+
         Vue.onBeforeMount(() => {
             // 阻止动画效果
             document.body.classList.add("hold-transition")

@@ -78,7 +78,7 @@ const MenuItem = {
       'menu-open': menu._opened_ && menu.children != null && menu.children.length > 0
        }">
       <template v-if="menu.type == 'label'">{{menu.title}}</template>
-      <a class="nav-link nav_ell"
+      <a class="nav-link"
         :href="menu.url||menu.path||'#'"
         :target="menu.target"
         :class="{'active':menu._active_ }"
@@ -86,7 +86,7 @@ const MenuItem = {
         @click="clickHandler">
         <i class="nav-icon" :class="menu.icon || 'far fa-circle'"></i>
         <p>
-        <span class="nav_text">{{menu.title || menu.label || menu.name}}</span>
+        {{menu.title || menu.label || menu.name}}
         <i class="right fas fa-angle-left" v-if="menu.children != null && menu.children.length > 0"></i>
 				<span class="right badge badge-danger" v-if="menu.isNew && !menu.messageCount">New</span>
 				<span class="badge badge-info right" v-if="menu.messageCount > 0">{{menu.messageCount}}</span>
@@ -116,14 +116,24 @@ const TreeMenu = {
       const menuStyle = Vue.inject('menuStyle');
       console.log("inject menuStyle", menuStyle)
 
+      const setCurrentMenu = Vue.inject("setCurrentMenu");
+
       const selectMenu = menu=> {
-        menu._opened_ = !menu._opened_;
-        // 当前菜单如果是选中状态或有子菜单，不做处理
+        // 如果有子菜单，表示要执行菜单的开合
+        if (menu.children && menu.children.length) {
+          menu._opened_ = !menu._opened_;
+          return;
+        }
+        // 当前菜单如果是选中状态，不做处理
         // 否则重新判断选中状态
-        if (menu._active_ || (menu.children && menu.children.length)) {
+        if (menu._active_) {
           return
         }
+
+        // 上报当前选中的菜单
+        setCurrentMenu(menu);
         
+        // 重置选中状态
         list.forEach( item=> {
           item._active_ = isActive(item);
         })
