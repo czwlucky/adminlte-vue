@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminLTE 3 | Vue3 | Router与Menu配合使用</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="css/adminlte.min.css">
+</head>
+<body>
+    <div id="app">
+      <lte-layout logo="img/AdminLTELogo.png" preloader-visible preloader-auto-close>
+        <!-- 顶部页头 -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light" style="min-height:3.5rem;">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <lte-push-menu></lte-push-menu>
+            </li>
+          </ul>
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <lte-fullscreen></lte-fullscreen>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- 左侧菜单 -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+          <a href="#" class="brand-link">
+            <img src="img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <span class="brand-text font-weight-light">AdminLTE 3 + Vue3</span>
+          </a>
+          <!-- Sidebar -->
+          <div class="sidebar">
+            <!-- Sidebar user panel (optional) -->
+            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+              <div class="image">
+                <img src="img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+              </div>
+              <div class="info">
+                <a href="#" class="d-block">Alexander Pierce</a>
+              </div>
+            </div>
+
+            <!-- SidebarSearch Form -->
+            <div class="form-inline" style="overflow: hidden;">
+              <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+                <div class="input-group-append">
+                  <button class="btn btn-sidebar">
+                    <i class="fas fa-search fa-fw"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sidebar Menu -->
+            <nav class="mt-2 mb-2">
+              <!-- 还可以使用default-menu-id="1"设置默认菜单，如果两个属性同时使用，先找到哪个算哪个 -->
+              <lte-tree-menu class="nav-child-indent" :menus="menus" :default-menu-url="currentUrl" :router="router"></lte-tree-menu>
+            </nav>
+          </div>
+          <!-- /.sidebar -->
+        </aside>
+
+        <!-- 工作区 -->
+        <div class="content-wrapper">
+          <div class="container">
+						<!-- 路由出口 -->
+						<!-- 路由匹配到的组件将渲染在这里 -->
+						<router-view></router-view>
+					</div>
+        </div>
+
+        <!-- 底部页脚 -->
+        <footer class="main-footer" style="min-height:3.5rem;">
+          Footer
+        </footer>
+      </lte-layout>
+    </div>
+</body>
+<script src="js/vue.global.3.2.26.js"></script>
+<!-- 路由 -->
+<script src="js/vue-router.global.js"></script>
+<!-- 动画 -->
+<script src="js/animations.js"></script>
+<!-- 组件 -->
+<script src="js/LayoutProvide.js"></script>
+<script src="js/PushMenuInject.js"></script>
+<script src="js/Fullscreen.js"></script>
+<script src="js/TreeMenu.js"></script>
+
+<script type="text/javascript">
+  const app = Vue.createApp({
+    setup() {
+      const currentUrl = Vue.ref("/dashboardv2");
+      const router = VueRouter.useRouter();
+
+      // 导航守卫：全局后置钩子，用于选中对应的菜单
+      router.afterEach((to, from) => {
+        console.log("全局路由守卫", to);
+        currentUrl.value = to.path;
+      })
+
+      //console.log("router", router);
+      // 虚拟菜单
+      const menus = [{
+        title: "Dashboard",
+        icon: "fas fa-tachometer-alt",
+        children: [{
+          id: 1,
+          title: "Dashboard v1",
+          isActive: true,
+          icon: "far fa-circle",
+          url: "/dashboardv1"
+        },{
+          id: 2,
+          title: "Dashboard v2",
+          icon: "far fa-circle",
+          url: "/dashboardv2"
+        },{
+          id: 3,
+          title: "Dashboard v3",
+          icon: "far fa-circle",
+          url: "/dashboardv3"
+        }]
+      }, {
+        title: "Widgets",
+        icon: "fas fa-th",
+        isNew: true,
+        url: "/widgets"
+      },{
+        title: "Layout Options",
+        icon: "fas fa-copy",
+        messageCount: 6,
+        isNew: true,
+        children: [{
+          title: "Top Navigation",
+          icon: "far fa-circle",
+        },{
+          title: "Top Navigation + Sidebar",
+          icon: "far fa-circle",
+        }]
+      },{
+        title: "Charts",
+        icon: "fas fa-chart-pie",
+        children: [{
+          title: "ChartJS",
+          icon: "far fa-circle",
+          path: "/charts"
+        },{
+          title: "Flot",
+          icon: "far fa-circle",
+        }]
+      },{
+        title: "UI Elements",
+        icon: "fas fa-tree",
+        children: [{
+          title: "General",
+          icon: "far fa-circle",
+        },{
+          title: "Icons",
+          icon: "far fa-circle",
+        }]
+      },{
+        title: "Forms",
+        icon: "fas fa-edit",
+        children: [{
+          title: "General Elements",
+          icon: "far fa-circle",
+        },{
+          title: "Advanced Elements",
+          icon: "far fa-circle",
+        }]
+      },{
+        title: "Tables",
+        icon: "fas fa-table",
+        children: [{
+          title: "Simple Tables",
+          icon: "far fa-circle",
+        }]
+      },{
+        title: "EXAMPLES",
+        type: "label"
+      },{
+        title: "Calendar",
+        icon: "fas fa-table",
+        messageCount: 2
+      },{
+        title: "Gallery",
+        icon: "fas fa-image"
+      },{
+        title: "Level 1",
+        icon: "fas fa-circle",
+        children: [{
+          title: "Level 2",
+          children: [{
+            title: "Level 3",
+          },{
+            title: "Level 3",
+          }]
+        },{
+          title: "Level 2",
+          children: [{
+            title: "Level 3",
+          },{
+            title: "Level 3",
+          }]
+        }]
+      },{
+        title: "Baidu",
+        icon: "fas fa-link",
+        messageCount: 2,
+        url: "http://www.baidu.com",
+        target: "_blank"
+      }];
+
+      return {
+        currentUrl,
+        menus,
+        router
+      }
+    }
+  });
+  Vue.components.forEach(element => {
+    app.component(element.name, element);
+  });
+
+  // 1. 定义路由组件.
+  // 也可以从其他文件导入
+  const Home = { template: '<div>Home</div>' }
+  const About = { template: '<div>About</div>' }
+  // 2. 定义一些路由
+  // 每个路由都需要映射到一个组件。
+  const routes = [
+    { path: '/dashboardv1', component: Home },
+    { path: '/widgets', component: About },
+  ]
+
+  // 使用路由
+  const router = VueRouter.createRouter({
+    // hash 模式。
+    history: VueRouter.createWebHashHistory(),
+    routes, // `routes: routes` 的缩写
+  })
+
+  //确保 _use_ 路由实例使整个应用支持路由。
+  app.use(router);
+
+  const vm = app.mount('#app');
+</script>
+
+<style>
+  /* 菜单选中时，父级菜单背景色渐显效果 */
+  .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
+  .sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active {
+    transition: background-color ease-in-out .1s, width ease-in-out .1s;
+  }
+</style>
+</html>

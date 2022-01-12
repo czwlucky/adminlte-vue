@@ -38,8 +38,9 @@ const ClassicLayout = {
         // PushMenu相关
         const overlay = Vue.ref(null);
 
+        let sidebarStyle = "sidebar-mini";
         let autoCollapseSize = 992;
-        let windowWidh = null;
+        let windowWidth = null;
 
         const toggleMenu = () => {
             if (!document.body.classList.contains("sidebar-collapse")) {
@@ -50,20 +51,20 @@ const ClassicLayout = {
         }
 
         const windowed = () => {
-            windowWidh = window.innerWidth || document.documentElement.clientWidth;
+            windowWidth = window.innerWidth || document.documentElement.clientWidth;
         }
 
         const collapseMenu = () => {
-            document.body.classList.add("sidebar-mini")
+            document.body.classList.add(sidebarStyle)
             document.body.classList.add("sidebar-collapse");
             document.body.classList.remove("sidebar-open");
-            if (windowWidh < autoCollapseSize) {
+            if (windowWidth < autoCollapseSize) {
                 document.body.classList.add("sidebar-closed");
             }
         }
 
         const openMenu = () => {
-            document.body.classList.remove("sidebar-mini")
+            document.body.classList.remove(sidebarStyle)
             document.body.classList.remove("sidebar-collapse");
             document.body.classList.remove("sidebar-closed");
             document.body.classList.add("sidebar-open");
@@ -122,7 +123,7 @@ const ClassicLayout = {
             // PushMenu相关
             windowed();
 
-            if (windowWidh < autoCollapseSize) {
+            if (windowWidth < autoCollapseSize) {
                 collapseMenu();
             }
 
@@ -132,7 +133,7 @@ const ClassicLayout = {
               if (event.target !== overlay.value) {
                 return;
               }
-              if (windowWidh < autoCollapseSize) {
+              if (windowWidth < autoCollapseSize) {
                 collapseMenu();
               }
             });

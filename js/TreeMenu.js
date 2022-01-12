@@ -19,12 +19,16 @@
 const MenuItem = {
   name: "LteTreeMenuItem",
   props: {
-      menu: Object
+      menu: Object,
+      router: Object,
   },
   setup(props, context) {
     const selectMenu = Vue.inject("selectMenu");
     const menuItemRoot = Vue.ref(null);
     const subMenus = Vue.ref(null);
+
+    const router = props.router;
+    //console.log("menuitem router", router)
 
     const clickHandler = event => {
       let menu = props.menu;
@@ -32,15 +36,19 @@ const MenuItem = {
       if (menu.url && menu.url.indexOf("http") === 0) {
         return;
       }
+      
+      // 如果有路由时，阻止默认行为
+      router && event.preventDefault();
 
       // 没有子菜单，直接触发菜单回调
       if (!menu.children || menu.children.length == 0) {
+        router && (menu.url || menu.path) && router.push(menu.url || menu.path);
         selectMenu(menu);
         return;
       }
 
-      // 阻止默认行为
-      event.preventDefault();
+      // 没有路由时阻止默认行为
+      !router && event.preventDefault();
 
       // 展开或关闭子菜单
       let subMenuEl = subMenus.value;
@@ -69,7 +77,8 @@ const MenuItem = {
     return {
       menuItemRoot,
       subMenus,
-      clickHandler
+      clickHandler,
+      router,
     }
   },
   template: `
@@ -94,7 +103,7 @@ const MenuItem = {
         </p>
       </a>
       <ul class="nav nav-treeview" ref="subMenus" v-if="menu.type!='label' && menu.children != null && menu.children.length > 0">
-        <lte-tree-menu-item v-for="child of menu.children" :menu="child"></lte-tree-menu-item>
+        <lte-tree-menu-item v-for="child of menu.children" :menu="child" :router="router"></lte-tree-menu-item>
       </ul>
     </li>
   `
@@ -106,9 +115,11 @@ const TreeMenu = {
     props: {
         menus: Array,
         defaultMenuId: Number|String,
-        defaultMenuUrl: String
+        defaultMenuUrl: String,
+        router: Object
     },
     setup(props, context) {
+      //console.log("menu router", props.router)
       // 包装成响应式对象，更新时，子组件才会发生变动
       const list = Vue.reactive(props.menus);
 
@@ -130,8 +141,6 @@ const TreeMenu = {
         if (menu._active_) {
           return
         }
-        // 向子组件暴漏选中菜单方法
-        Vue.provide("selectMenu", selectMenu);
 
         // 上报当前选中的菜单
         setCurrentMenu(menu);
@@ -156,6 +165,8 @@ const TreeMenu = {
           return item == menu; //(item.id && item.id == menu.id) || (item.url && item.url == menu.url) || (item.path && item.path == menu.path) || (item.title && item.title == menu.title) || (item.label && item.label == menu.label) || (item.name && item.name == menu.name);
         }
       }
+      // 向子组件暴漏选中菜单方法
+      Vue.provide("selectMenu", selectMenu);
       
       // 默认菜单
       let id = props.defaultMenuId;
@@ -173,6 +184,28 @@ const TreeMenu = {
           }
         }
       }
+
+      // 监听默认菜单变化，选中新指定的菜单
+      Vue.watch(
+        () => props.defaultMenuUrl,
+        (newVal, oldVal) => {
+          //console.log("默认菜单URL发生变化", newVal, oldVal);
+          let menu = findDefaultMenu({url: newVal}, list);
+          if (menu) {
+            selectMenu(menu);
+          }
+        }
+      )
+      Vue.watch(
+        () => props.defaultMenuId,
+        (newVal, oldVal) => {
+          //console.log("默认菜单ID发生变化", newVal, oldVal);
+          let menu = findDefaultMenu({id: newVal}, list);
+          if (menu) {
+            selectMenu(menu);
+          }
+        }
+      )
 
       function findDefaultMenu(defaultMenu, menus) {
         for (const menu of menus) {
@@ -198,7 +231,7 @@ const TreeMenu = {
     },
     template: `
       <ul class="nav nav-pills nav-sidebar flex-column" :class="menuStyle.styles" data-widget="treeview" role="menu" data-accordion="false" style="overflow-x:hidden;">
-        <lte-tree-menu-item v-for="menu of list" :menu="menu"></lte-tree-menu-item>
+        <lte-tree-menu-item v-for="menu of list" :menu="menu" :router="router"></lte-tree-menu-item>
       </ul>
     `
 }
