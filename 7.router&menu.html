@@ -21,6 +21,15 @@
             <li class="nav-item">
               <lte-push-menu></lte-push-menu>
             </li>
+            <li class="nav-item d-none d-sm-inline-block" v-if="currentMenu.menu">
+              <router-link :to="currentMenu.menu.url" class="nav-link"><b>{{currentMenu.menu.title}}</b></router-link>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+              <router-link to="/dashboardv1" class="nav-link">dashboardv1</router-link>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+              <router-link to="/dashboardv2" class="nav-link">dashboardv2</router-link>
+            </li>
           </ul>
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
@@ -62,7 +71,7 @@
             <!-- Sidebar Menu -->
             <nav class="mt-2 mb-2">
               <!-- 还可以使用default-menu-id="1"设置默认菜单，如果两个属性同时使用，先找到哪个算哪个 -->
-              <lte-tree-menu class="nav-child-indent" :menus="menus" :default-menu-url="currentUrl" :router="router"></lte-tree-menu>
+              <lte-tree-menu class="nav-child-indent" @menu-change="menuChangeHandler" :menus="menus" :default-menu-url="currentUrl" :router="router"></lte-tree-menu>
             </nav>
           </div>
           <!-- /.sidebar -->
@@ -220,10 +229,18 @@
         target: "_blank"
       }];
 
+      const currentMenu = Vue.reactive({menu:null});
+      const menuChangeHandler = menu=> {
+        console.log("menu changed", menu);
+        currentMenu.menu = menu;
+      }
+
       return {
         currentUrl,
         menus,
-        router
+        router,
+        currentMenu,
+        menuChangeHandler
       }
     }
   });
@@ -235,11 +252,13 @@
   // 也可以从其他文件导入
   const Home = { template: '<div>Home</div>' }
   const About = { template: '<div>About</div>' }
+  const NotFound = { template: '<div>404</div>' }
   // 2. 定义一些路由
   // 每个路由都需要映射到一个组件。
   const routes = [
     { path: '/dashboardv1', component: Home },
     { path: '/widgets', component: About },
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound },
   ]
 
   // 使用路由

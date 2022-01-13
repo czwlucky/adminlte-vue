@@ -112,6 +112,7 @@ const MenuItem = {
 // 树型菜单主类
 const TreeMenu = {
     name: "LteTreeMenu",
+    emits: ['menuChange'],
     props: {
         menus: Array,
         defaultMenuId: Number|String,
@@ -142,8 +143,10 @@ const TreeMenu = {
           return
         }
 
-        // 上报当前选中的菜单
+        // 上报当前选中的菜单，任何兄弟组件及其子孙组件都可以随时获取当前选中的菜单
         setCurrentMenu(menu);
+        // 产生事件，捕获该事件可以获得当前选中的菜单
+        context.emit("menuChange", menu);
         
         // 重置选中状态
         list.forEach( item=> {
