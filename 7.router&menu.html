@@ -21,7 +21,7 @@
             <li class="nav-item">
               <lte-push-menu></lte-push-menu>
             </li>
-            <li class="nav-item d-none d-sm-inline-block" v-if="currentMenu.menu">
+            <li class="nav-item d-none d-sm-inline-block" v-if="currentMenu.menu && currentMenu.menu.url">
               <router-link :to="currentMenu.menu.url" class="nav-link"><b>{{currentMenu.menu.title}}</b></router-link>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
