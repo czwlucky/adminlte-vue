@@ -16,6 +16,7 @@ const ClassicLayout = {
         menuCollapse: Boolean,
         darkMode: Boolean,
         footerFixed: Boolean,
+        headerFixed: Boolean,
     },
     setup(props) {
         // 预加载遮盖层
@@ -93,11 +94,19 @@ const ClassicLayout = {
         Vue.onBeforeMount(() => {
             // 阻止动画效果
             document.body.classList.add("hold-transition")
-
+            // 暗黑模式
             if (props.darkMode) {
                 document.body.classList.add("dark-mode")
             }
-
+            // 头部固定
+            if (props.headerFixed) {
+                document.body.classList.add("layout-navbar-fixed")
+            }
+            // 页脚固定
+            if (props.headerFixed) {
+                document.body.classList.add("layout-footer-fixed")
+            }
+            // 侧边栏隐藏
             if (props.sidebarClose) {
                 document.body.classList.add("sidebar-collapse");
                 document.body.classList.add("sidebar-close");
