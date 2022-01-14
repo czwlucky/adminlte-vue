@@ -1,4 +1,4 @@
-const PushMenuMixinInject = {
+const PushMenuInject = {
     name: "LtePushMenu",
     props: {
     },
@@ -15,4 +15,4 @@ const PushMenuMixinInject = {
 }
 
 Vue.components = Vue.components || [];
-Vue.components.push(PushMenuMixinInject);
+Vue.components.push(PushMenuInject);

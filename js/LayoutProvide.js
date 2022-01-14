@@ -12,7 +12,10 @@ const ClassicLayout = {
             default: false
         },
         preloaderAutoClose: Boolean,
-        menuCollapse: Boolean
+        sidebarClose: Boolean,
+        menuCollapse: Boolean,
+        darkMode: Boolean,
+        footerFixed: Boolean,
     },
     setup(props) {
         // 预加载遮盖层
@@ -55,7 +58,9 @@ const ClassicLayout = {
         }
 
         const collapseMenu = () => {
-            document.body.classList.add(sidebarStyle)
+            if (!props.sidebarClose) {
+                document.body.classList.add(sidebarStyle);
+            }
             document.body.classList.add("sidebar-collapse");
             document.body.classList.remove("sidebar-open");
             if (windowWidth < autoCollapseSize) {
@@ -89,10 +94,19 @@ const ClassicLayout = {
             // 阻止动画效果
             document.body.classList.add("hold-transition")
 
-            if (!props.menuCollapse) {
-                openMenu();
+            if (props.darkMode) {
+                document.body.classList.add("dark-mode")
+            }
+
+            if (props.sidebarClose) {
+                document.body.classList.add("sidebar-collapse");
+                document.body.classList.add("sidebar-close");
             } else {
-                collapseMenu();
+                if (!props.menuCollapse) {
+                    openMenu();
+                } else {
+                    collapseMenu();
+                }
             }
         })
 
