@@ -105,13 +105,19 @@
           //const eventTarget = findOrigin(event.target);
           //console.log("click", originRef.value, eventTarget)
           //console.log(eventTarget !== originRef.value && eventTarget !== targetRef.value, eventTarget);
-					if (!findOrigin(event.target)) {
+          console.log("dropdown click", originRef.value.contains(event.target))
+					if (
+            //!findOrigin(event.target)
+            !originRef.value.contains(event.target)
+          ) {
             console.log("hide dropdown")
             props.targetRef.classList.remove("show");
             originRef.value.parentNode.classList.remove("show");
             opened = false;
           }
 				});
+
+        // TODO: 组件卸载时注销事件
 
         function findOrigin(el) {
           //console.log(el)
