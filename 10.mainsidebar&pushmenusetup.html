@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminLTE 3 | Vue3 | Dropdown</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <!-- flag-icon-css -->
+  <link rel="stylesheet" href="plugins/flag-icon-css/css/flag-icon.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="css/adminlte.min.css">
+</head>
+<body>
+    <div id="app">
+      <lte-layout>
+        <!-- 顶部页头 -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light" style="min-height:3.5rem;">
+          <ul class="navbar-nav" title="注入式PushMenu">
+            <li class="nav-item">
+              <a class="nav-link" href="#" @click.prevent ref="pushmenu"><i class="fas fa-bars"></i></a>
+            </li>
+            <li class="nav-item" title="组件式PushMenu">
+              <lte-push-menu></lte-push-menu>
+            </li>
+            <li class="nav-item" title="组件式PushMenu">
+              <lte-push-menu>
+                <i class="fas fa-ellipsis-h"></i>
+              </lte-push-menu>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- 左侧菜单 -->
+        <lte-main-sidebar :push-menu="pushmenu" status="collapsed">
+          <a href="#" class="brand-link">
+            <img src="img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <span class="brand-text font-weight-light">AdminLTE 3 + Vue3</span>
+          </a>
+        </lte-main-sidebar>
+
+        <!-- 工作区 -->
+        <div class="content-wrapper">
+          
+        </div>
+
+        <!-- 底部页脚 -->
+        <footer class="main-footer" style="min-height:3.5rem;">
+          Footer
+        </footer>
+      </lte-layout>
+    </div>
+</body>
+<script src="js/vue.global.3.2.26.js"></script>
+<!-- 路由 -->
+<script src="js/vue-router.global.js"></script>
+<!-- 动画 -->
+<script src="js/animations.js"></script>
+<!-- 可复用逻辑 -->
+<script src="js/toggleMenu.js"></script>
+<!-- 组件 -->
+<script src="js/Layout.js"></script>
+<script src="js/Fullscreen.js"></script>
+<script src="js/MainSidebar.js"></script>
+<script src="js/PushMenuInject.js"></script>
+
+<script type="text/javascript">
+  const app = Vue.createApp({
+    setup() {
+      const pushmenu = Vue.ref(null);
+      return {
+        pushmenu
+      }
+    }
+  });
+  Vue.components.forEach(element => {
+    app.component(element.name, element);
+  });
+
+  app.mount('#app');
+</script>
+</html>

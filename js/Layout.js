@@ -18,11 +18,26 @@ const Layout = {
         // 预加载遮盖层是否显示，默认不显示
         const preloaderShow = Vue.ref(props.preloaderVisible);
 
+        // toggle mainsidebar
+        const isMainSidebarCollapsed= Vue.ref(false);
+        // 向子孙组件提供MainSidebar组件的折叠状态
+        Vue.provide('isMainSidebarCollapsed', isMainSidebarCollapsed);
+        // 上报折叠状态，为MainSidebar组件提供的方法
+        Vue.provide('reportMainSidebarStatus', isCollapsed=> {
+            console.log("接收到上传的MainSidebar折叠状态为", isCollapsed)
+            isMainSidebarCollapsed.value = isCollapsed;
+        })
+        // 切换MainSidebar组件折叠状态
+        Vue.provide('toggleMenu', ()=> {
+            console.log("Provide(toggleMenu)被触发了")
+            isMainSidebarCollapsed.value = !isMainSidebarCollapsed.value;
+        })
+
         Vue.onBeforeMount(() => {
             // 阻止动画效果
             document.body.classList.add("hold-transition")
             // 最小化sidebar
-            document.body.classList.add("sidebar-mini")
+            //document.body.classList.add("sidebar-mini")
         })
 
         Vue.onMounted(()=> {
