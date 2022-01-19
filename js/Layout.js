@@ -10,6 +10,13 @@ const Layout = {
         preloaderVisible: {
             type: Boolean,
             default: false
+        },
+        // 默认样式
+        initialClass: {
+            type: Array,
+            default() {
+                return ['layout-top-nav']
+            }
         }
     },
     setup(props) {
@@ -38,6 +45,13 @@ const Layout = {
             document.body.classList.add("hold-transition")
             // 最小化sidebar
             //document.body.classList.add("sidebar-mini")
+            // 初始化布局样式
+            const initialClass = props.initialClass;
+            if (initialClass && initialClass.length) {
+                initialClass.forEach( item => {
+                    document.body.classList.add(item)
+                });
+            }
         })
 
         Vue.onMounted(()=> {

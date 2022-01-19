@@ -72,6 +72,10 @@ const MainSidebar = {
         if (props.status !== "hidden") {
           document.body.classList.add(sidebarStyle);
         }
+        // 侧边栏与该样式冲突，需要排除该样式
+        if (document.body.classList.contains("layout-top-nav")) {
+          document.body.classList.remove("layout-top-nav");
+        }
         windowed();
         if (windowWidh < autoCollapseSize || props.status === "collapsed" || props.status === "hidden") {
           collapseMenu();
