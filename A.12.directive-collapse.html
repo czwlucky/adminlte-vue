@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminLTE 3 | Vue3 | Dropdown</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <!-- flag-icon-css -->
+  <link rel="stylesheet" href="plugins/flag-icon-css/css/flag-icon.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="css/adminlte.min.css">
+</head>
+<body>
+    <div id="app">
+      <!-- 默认为 Top Navigation 模式 -->
+      <lte-layout>
+        <!-- 顶部页头 -->
+        <nav class="main-header navbar navbar-expand navbar-light navbar-white" style="min-height:3.5rem;">
+          <div class="container ml-3" style="max-width: 100%;">
+            <a href="index3.html" class="navbar-brand" @click.prevent>
+              <img src="img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+                   style="opacity: .8">
+              <span class="brand-text font-weight-light">AdminLTE 3</span>
+            </a>
+            
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <lte-fullscreen></lte-fullscreen>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <!-- 工作区 -->
+        <div class="content-wrapper">
+          <div class="container d-flex flex-column pt-1 align-items-center">
+            <div class="card" style="width: 350px;">
+              <div class="card-header">
+                Collapse Example
+              </div>
+              <div class="card-body">
+                <p class="d-flex flex-row justify-content-between">
+                  <a class="btn btn-primary" href="#" @click.prevent v-collapse="{target:()=>txtArea3, events:['mouseover','mouseleave']}">
+                    MouseOver Collapse
+                  </a>
+                </p>
+                <div class="collapse show" ref="txtArea3">
+                    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+                </div>
+              </div>
+            </div>
+            <!-- .card end -->
+            <div class="card" style="width: 350px;">
+              <div class="card-header">
+                Collapse Example
+              </div>
+              <div class="card-body">
+                <p class="d-flex flex-row justify-content-between">
+                  <a class="btn btn-primary" href="#" @click.prevent v-collapse="()=>txtArea">
+                    Toggle Collapse
+                  </a>
+                  <a class="btn btn-primary" href="#" @click.prevent v-collapse="()=>txtArea2">
+                    Toggle Below
+                  </a>
+                </p>
+                <div class="collapse show" ref="txtArea">
+                    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+                </div>
+              </div>
+            </div>
+            <!-- .card end -->
+            <div class="card" style="width: 350px;">
+              <div class="card-header">
+                Collapse Example
+              </div>
+              <div class="card-body">
+                <p class="d-flex flex-row justify-content-between">
+                  <a class="btn btn-primary" href="#" @click.prevent v-collapse="()=>txtArea2">
+                    Toggle Collapse
+                  </a>
+                  <a class="btn btn-primary" href="#" @click.prevent v-collapse="()=>txtArea">
+                    Toggle Above
+                  </a>
+                </p>
+                <div class="collapse" ref="txtArea2">
+                    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+                </div>
+              </div>
+            </div>
+            <!-- .card end -->
+          </div>
+        </div>
+
+        <!-- 底部页脚 -->
+        <footer class="main-footer" style="min-height:3.5rem;">
+          Footer
+        </footer>
+      </lte-layout>
+    </div>
+</body>
+<script src="js/vue.global.3.2.26.js"></script>
+<!-- 动画 -->
+<script src="js/animations.js"></script>
+<!-- 组件 -->
+<script src="js/Layout.js"></script>
+<script src="js/Fullscreen.js"></script>
+
+<script type="text/javascript">
+  // 自定义指令
+  Vue.directives = Vue.directives || [];
+
+  const example = {
+      name: 'collapse',
+      mounted(el, binding) {
+        console.log("指令挂载完成", el, binding.value);
+        const value = binding.value;
+        let target = null;
+        if (value == null) {
+          console.warn("Usage: v-collapse=\"()=>targetEl\"");
+          return;
+        }
+        if (typeof value === "function") {
+          target = value();
+        } else {
+          target = value.target && value.target();
+        }
+        if (!target) {
+          console.warn("Usage: v-collapse=\"()=>targetEl\"");
+          return;
+        }
+
+        const events = value.events;
+        if (events && events.length) {
+          events.forEach(event=> {
+            el.addEventListener(event, toggle)
+          })
+        } else {
+          el.addEventListener("click", toggle)
+        }
+
+        let isExpended = false;
+        function toggle() {
+          if (target) {
+            target.style.overflow = "hidden";
+            let offsetHeight = target.offsetHeight;
+            console.log("offsetHeight", offsetHeight)
+            // 通过第一次获取实际高度，可以知道元素是否已展开
+            isExpended = !!offsetHeight;
+            if (!isExpended) {
+              console.log("get offsetHeight again.")
+              // 这个样式会影响获取实际高度
+              target.classList.remove("collapse");
+              offsetHeight = target.offsetHeight;
+            }
+            console.log("actual height", offsetHeight)
+            
+            if (isExpended) {
+              target.style.height = offsetHeight + "px";
+            }
+            target.classList.add("collapsing")
+            if (target.classList.contains("show")) {
+              target.classList.remove("show")
+              target.classList.remove("collapse");
+            }
+            
+            // 一定要有一个延时处理，即使这个时间非常短，也可以给dom有一个准备的时间差，
+            // 否则动画效果出不来
+            setTimeout(()=> {
+              target.style.height = (isExpended ? 0 : offsetHeight) + "px";
+              setTimeout(()=> {
+                target.classList.remove("collapsing")
+                target.style.overflow = "";
+                target.style.height = "";
+                target.classList.add("collapse");
+                if (!isExpended) {
+                  target.classList.add("show");
+                }
+              },350);
+            });
+          }
+        } // end of function toggle
+      }
+  }
+  Vue.directives.push(example);
+
+  const app = Vue.createApp({
+    setup() {
+      const txtArea = Vue.ref(null);
+      const txtArea2 = Vue.ref(null);
+      const txtArea3 = Vue.ref(null);
+      console.log("app setup, 早于txtArea挂载")
+      Vue.onMounted(()=> {
+        console.log("app mounted，晚于txtArea挂载", txtArea)
+      })
+      return {
+        txtArea,
+        txtArea2,
+        txtArea3
+      }
+    }
+  });
+  Vue.components.forEach(element => {
+    app.component(element.name, element);
+  });
+  Vue.directives.forEach(dir => {
+    app.directive(dir.name, dir);
+  });
+
+  app.mount('#app');
+</script>
+</html>
