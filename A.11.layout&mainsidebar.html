@@ -17,7 +17,7 @@
 <body>
     <div id="app">
       <!-- initial-class 设置全局样式，这里layout-top-nav是重点，为了演示main-sidebar与该样式的互斥效果 -->
-      <lte-layout :initial-class="['layout-fixed', 'layout-navbar-fixed','layout-top-nav']">
+      <lte-layout :initial-class="['dark-mode', 'layout-footer-fixed', 'layout-navbar-fixed','layout-top-nav']">
         <!-- 顶部页头 -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light" style="min-height:3.5rem;">
           <ul class="navbar-nav">
@@ -39,7 +39,7 @@
         </lte-main-sidebar>
 
         <!-- 工作区 -->
-        <div class="content-wrapper">
+        <div class="content-wrapper" style="height: 800px;">
           
         </div>
 
